@@ -1,11 +1,10 @@
 \name{ANDRICH}
 \alias{ANDRICH}
 \docType{data}
-\title{Andrich attitude scale towards capital punishment
+\title{Andrich's attitude scale towards capital punishment
 }
-\description{ D. Andrich's (1988) scale designed to measure the attitude from a sample towards capital
-capital punishment. The data set contains the dichotomous responses of \code{nrow(ANDRICH)=54} students on \code{ncol(ANDRICH)=8} statements concerning capital punishment.
-
+\description{ D. Andrich's (1988) scale designed to measure the attitude from a sample of students towards
+capital punishment. The data set contains the dichotomous responses of 54 students on 8 statements concerning capital punishment.
 }
 \usage{data(ANDRICH)}
 \format{
@@ -50,10 +49,8 @@ The persons who responded to the statements for the analysis were 54 graduate st
 \source{
 D. Andrich. (1988). \emph{The Application of an Unfolding Model of the PIRT Type to the Measurement of Attitude}. Applied psychological measurement 12.1 (1988): 33-51.
 }
-\author{Spyros E. Balafas.
 
-Maintainer: Spyros E. Balafas (\email{s.balafas@rug.nl})
-}
+
 \references{
 D. Andrich. (1988). \emph{The Application of an Unfolding Model of the PIRT Type to the Measurement of Attitude}. Applied psychological measurement 12.1 (1988): 33-51.
 

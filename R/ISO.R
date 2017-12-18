@@ -51,4 +51,3 @@ ISO <-function(X){
   }
   return(ISO.mat)
 }
-

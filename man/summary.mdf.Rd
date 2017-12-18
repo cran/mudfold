@@ -2,25 +2,25 @@
 \alias{summary.mdf}
 
 \title{
-\code{summary} method for \code{mdf} class objects.
+\code{summary} method for S3 class \code{mdf} objects.
 }
-\description{S3 method for summarize \code{mdf} class objects
+\description{Generic function that is used in order to summarize information from \code{mdf} class objects.
 }
 \usage{
 \method{summary}{mdf}(object,...)
 }
 
 \arguments{
-   \item{object}{Object of class \code{mdf}}
-  \item{\dots}{Ignored}
+   \item{object}{Object of class \code{mdf} resulted from the function \code{mudfold} or \code{as.mudfold}. }
+  \item{\dots}{Other arguments passed on to method \code{summary}. Not currently used.}
 }
 
 \details{
-Summarizing information from the MUDFOLD method object which has been calculated from \code{\link{mudfold}} function.
+A summary of the MUDFOLD scale that has been calculated with the \code{\link{mudfold}} function.
 }
 
-\value{ returns an \code{m+1x9} data frame with parameters concerning the fit of each item in the scale as well as for the quality of the scale as a whole. The columns of the resulting data frame are the following.
-    \item{index}{: \code{m} selected items in the estimated MUDFOLD rank order. In the \code{total} cell information for the scale as a whole is given wherever is available.}
+\value{ returns a data frame with parameters concerning the fit of each item in the scale as well as for the quality of the scale as a whole. The columns of the resulting data frame are the following.
+    \item{index}{: \code{m} selected items in the estimated MUDFOLD rank order. In the cell \code{total}, information for the total scale is given wherever this is available.}
     \item{samp.size}{: The sample size of the data.}
     \item{freq}{: observed frequency of positive responses.} 
     \item{prop}{: observed proportion of positive responses.}
@@ -33,9 +33,9 @@ Summarizing information from the MUDFOLD method object which has been calculated
 
 
 
-\author{Spyros E. Balafas.
+\author{Spyros E. Balafas (auth.), Wim P. Krijnen (auth.), Wendy J. Post (contr.), Ernst C. Wit (auth.)
 
-Maintainer: Spyros E. Balafas (\email{sp.balafas@gmail.com})
+Maintainer: Spyros E. Balafas (\email{s.balafas@rug.nl})
 }
 
 \references{

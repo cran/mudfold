@@ -1,6 +1,6 @@
 print.mdf <- function(x, Item.info= FALSE, Diagnostics=FALSE, ...){
   cat("\nCall: ")
-  print(x$call)
+  print(x$call,...)
   cat("\nIndividuals:", x$sample.size,"\n")
   cat("\nItems:", x$no.items,"\n")
   cat("\nItem set:",x$starting.items,"\n")
@@ -27,20 +27,21 @@ print.mdf <- function(x, Item.info= FALSE, Diagnostics=FALSE, ...){
     cat( paste(""), fill = TRUE )
     cat( paste( "Dominance matrix for Mudfold order:"  ), fill = TRUE )
     cat( paste(""), fill = TRUE )
-    print(x$Dominance.matrix)
+    print(x$Dominance.matrix,...)
     cat( paste(""), fill = TRUE )
     cat( paste( "Adjacency matrix for Mudfold order:"  ), fill = TRUE )
     cat( paste(""), fill = TRUE )
-    print(x$Adjacency.matrix)
+    print(x$Adjacency.matrix,...)
     cat( paste(""), fill = TRUE )
     cat( paste( "Correlation matrix for Mudfold scale:"  ), fill = TRUE )
     cat( paste(""), fill = TRUE )
-    print(x$Correlation.matrix)
+    print(x$Correlation.matrix,...)
     cat( paste(""), fill = TRUE )
     cat( paste( "Conditional Adjacency matrix for Mudfold scale: ", x$ISO  ), fill = TRUE )
     cat( paste(""), fill = TRUE )
-    print(x$Cond.Adjacency.matrix)
+    print(x$Cond.Adjacency.matrix,...)
   }
   
   cat("\n")
 }
+

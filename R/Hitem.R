@@ -1,17 +1,10 @@
-Hitem <-function(X){
-  strt.names <- colnames(X)
-  K = ncol(X)
-  n <- nrow(X)
-  J <- colnames(X)
-  EO<- Err_exp(X);dimnames(EO) <- list(J,J,J)
-  O <- Err_obs(X);dimnames(O) <- list(J,J,J)
-  f <- J
-  cmbf <- combinations(n=K, r=3, v=f, set=FALSE, repeats.allowed=FALSE)
+Hitem <-function(X,K=K,n=n,J=J,EO=EO,O=O){
+  cmbf <- combinations(n=K, r=3, v=J, set=FALSE, repeats.allowed=FALSE)
   ncm <- nrow(cmbf)
   Hj <- NULL
   for (i in 1 : K){
     ind <- NULL;vind <- NULL
-    ind <- f[i]
+    ind <- J[i]
     for (g in 1:ncm){
       if (ind %in% cmbf[g,]){
         vind <- c(vind,g)
@@ -21,7 +14,7 @@ Hitem <-function(X){
     tind <- cmbf[vind,]
     Oind <- sum(O[tind])
     EOind <- sum(EO[tind])
-    Hind <- 1 - Oind / EOind
+    Hind <- 1 - (Oind / EOind)
     Hj <- c(Hj,Hind)
   }
   return(Hj)

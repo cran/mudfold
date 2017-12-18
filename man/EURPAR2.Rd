@@ -5,7 +5,7 @@
 Preferences of European party activists.
 }
 \description{
-European party activists preferences for two political parties in the European parliament in 1980. A sample consisted of 1786 individuals are asked to endorse 2 out of 6 (pick 2/6 case) political parties from the European parliament.
+European party activists preferences for two political parties in the European parliament in 1980. A sample consisted of 1786 individuals are asked to pick \eqn{2} out of \eqn{6} political parties from the European parliament.
 }
 \usage{data("EURPAR2")}
 \format{
@@ -20,15 +20,12 @@ European party activists preferences for two political parties in the European p
   }
 }
 \details{
-The data has been first studied by Van Schuur (1984) and further by W. J. Post (1992).
+The data have been first studied by Van Schuur (1984) and further by W. J. Post (1992).
 }
 \source{
 W.H. Van Schuur.(1984). \emph{Structure in Political Beliefs: A New Model for Stochastic Unfolding with Application to European Party Activists}. CT Press.
 }
-\author{Spyros E. Balafas.
 
-Maintainer: Spyros E. Balafas (\email{s.balafas@rug.nl})
-}
 \references{
 W.H. Van Schuur.(1984). \emph{Structure in Political Beliefs: A New Model for Stochastic Unfolding with Application to European Party Activists}. CT Press.
 

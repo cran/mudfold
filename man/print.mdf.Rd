@@ -2,7 +2,7 @@
 \alias{print.mdf}
 \title{\code{print} method for \code{mdf} class objects.
 }
-\description{S3 method for \code{print} \code{mdf} class objects.
+\description{S3 generic function for printing \code{mdf} class objects.
 }
 
 \usage{
@@ -13,11 +13,11 @@
    \item{x}{Object of class \code{mdf}}
    \item{Item.info}{logical argument. If \code{Item.info=TRUE} then additional information for each item in the scale is printed.}
    \item{Diagnostics}{logical argument. If \code{Diagnostics= TRUE} then the diagnostic matrices for the item order are printed.}
-   \item{...}{other arguments will be ignored.}
+   \item{...}{further arguments passed on to the \code{print} method.}
 }
 
 
-\author{Spyros E. Balafas.
+\author{Spyros E. Balafas (auth.), Wim P. Krijnen (auth.), Wendy J. Post (contr.), Ernst C. Wit (auth.)
 
 Maintainer: Spyros E. Balafas (\email{s.balafas@rug.nl})
 }

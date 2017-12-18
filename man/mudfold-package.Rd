@@ -1,27 +1,22 @@
 \name{mudfold-package}
 \alias{mudfold-package}
 \docType{package}
-\title{MUDFOLD : A Nonparametric Model for Undolding Scale Analysis
+\title{MUDFOLD : A nonmonotonic nonparametric model for undolding scale analysis.
 }
 \description{
-MUDFOLD is a nonparametric probabilistic model for unfolding founded by W. Van Schuur and further developed by W.J. Post. MUDFOLD method can be used to analyse proxomity item response data. The package incorporates the main function \code{mudfold} which is used to fit MUDFOLD method to binary questionnaire data with no missing values.
-
+This package can be used for the purpose of finding unfolding structures from selected items in tests or questionnaires. Such structures, represent the underlying latent ordering of those items. The main function of this package is called \code{\link{mudfold}} and fits the Van Schuur's scale construction method to binary proximity items. The method is called Multiple UniDimensional unFOLDing (MUDFOLD) and is an item selection algorithm belonging in the class of Nonparametric Item Response Theory (IRT) models.
 }
 \details{
-This package contains the main \code{\link{mudfold}} function which is used to determine the order of a maximal subset consisted of \eqn{m \le K} items such that the obtained partitioned data fits sufficiently the unfolding scale assumptions. A binary (i.e, \code{(0,1)}) valued, \code{n x K} matrix or a data frame \code{data} with subjects in the rows and items in the columns must be used as an input. The output of the main function is a list of class \code{.mdf} for which S3 methods for print, summary and plot are available to the user.
+MUDFOLD is a nonparametric probabilistic model for unidimensional unfolding. Originally developed by W. Van Schuur (1984) and further extended following ideas by W.J. Post (1992) who derived testable properties for the model fit. This method can be used to analyse proximity items pressumably generated from a nonmonotonic (unimodal) Item Response Function (IRF). The package incorporates the main function \code{\link{mudfold}} which is used to estimate the MUDFOLD scale to binary valued proximity items. The output of the main function is a list of S3 class \code{.mdf}, for which \code{print()}, \code{summary()} and \code{plot()} generic functions are available to the user.
 
-MUDFOLD item selection algorithm in the process of building an unfolding scale makes use of scalability coefficients. H coefficients of scalability are analogous to Loevinger's coefficient of homogeneity for a cumulative scale used by Mokken (MH model, DM model) (1972) and from W.Van Schuur in MUDFOLD as a scalability measure. This coefficients in MUDFOLD can be calculated for:
+The data must be given in an \eqn{n \times p} binary \code{matrix} or \code{data.frame} with \eqn{n} respondents in the rows and \eqn{p} items in the columns. Each row of the data corresponds to the selections of the \eqn{i}-th individual on a set of \eqn{p} items. Missing values (NA) are not allowed. 
 
-Triples of items,\cr
+Ultimate goal for MUDFOLD is to determine a unidimensional rank order of a (sub)set of items such that, they constitute an appropriate scale for measuring a common latent trait of the respondents. The estimation of the item order is done through an heuristic item selection algorithm, which tests iteratively the item fit to the scale with the use of scalability coefficients.
 
-Items individually,\cr
-
-The whole scale.\cr
-
-The main \code{\link{mudfold}} function makes use of the latter scalability coefficients to determine an unfolding item order on the basis of MUDFOLD model assumptions. Usefull quantitative information for the scale quality is provided in the \code{.mdf} class output of the main function. S3 methods for \code{.mdf} class objectrs are available (see \code{\link{summary.mdf}}, \code{\link{plot.mdf}}, \code{\link{print.mdf}}) with \pkg{mudfold} package.
+MUDFOLD's H coefficients of scalability are based to Loevinger's coefficient of homogeneity. In MUDFOLD, H coefficients utilize a scalability measure that is used in several criteria in the item selection algorithm. This coefficient in MUDFOLD can be calculated for triples of items, individual items, and the total scale.
 }
 
-\author{Spyros E. Balafas.
+\author{Spyros E. Balafas (auth.), Wim P. Krijnen (auth.), Wendy J. Post (contr.), Ernst C. Wit (auth.)
 
 Maintainer: Spyros E. Balafas (\email{s.balafas@rug.nl})
 }
@@ -41,21 +36,14 @@ data}. Methodika.
 
 \examples{
 \dontrun{
-# Capital punishment data from Andrich
-data(ANDRICH)
-# Fit MUDFOLD method to estimate an item rank order
-fit <- mudfold(ANDRICH, lower.boundary= .3, estimation="rank")
-# Print the .mdf class object fit
-fit
-# Summary of the model fit results
-summary(fit)
-# Visually check the Conditional adjacency matrix
-fit$Cond.Adjacency.matrix
-# Plot the empirical estimates of the IRFs
-plot(fit)
-}
-}
+# Install the R package mudfold
+install.packages("mudfold")
 
+# Load the R package mudfold
+library(mudfold)
+
+}
+}
 
 
 \keyword{package}

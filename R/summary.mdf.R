@@ -24,5 +24,3 @@ summary.mdf <-function(object,...){
   summ_ob$Iso <- c(Iso.stat, Iso.stat.tot)
   return(summ_ob)
 }
-
-

@@ -23,10 +23,9 @@ param_est<-function(X,method=c("rank","quantile")){
         out<-list(betas=r,thetas=Tqj)
       }
     }
-    
     return(out)
   }else{
     if (sum(method %in% c("rank","quantile"))==0) print("Provide a valid estimation method.")
-    if (sum(method %in% c("rank","quantile"))==2) print("Select one of the two estimation methods.")
+    if (sum(method %in% c("rank","quantile"))==2) print("Select one of the two available estimation methods.")
   }
 }

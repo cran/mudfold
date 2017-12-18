@@ -1,15 +1,20 @@
 Package: mudfold
 Type: Package
-Title: A Nonparametric Model for Unfolding Scale Analysis
-Version: 1.0
-Date: 2017-3-30
-Author: Spyros Balafas
-Maintainer: Spyros Balafas <s.balafas@rug.nl>
-Depends: R (>= 3.3.3), gtools, zoo, ggplot2, reshape2, stats, utils
-Description: Nonparametric item response theory model fruitful for the analysis of proximity data.
+Title: Multiple UniDimensional unFOLDing
+Version: 1.1.0
+Date: 2017-12-11
+Authors@R: c(person("Spyros", "Balafas", email = "s.balafas@rug.nl", role = c("aut", "cre")),person("Wim", "Krijnen", role = "aut"),person("Wendy", "Post", role = "ctr"),person("Ernst", "Wit", role = "aut"))
+Description: Nonparametric item response theory (IRT) model for nonmonotonic IRFs, which is fruitful for scale analysis of proximity items.
+Depends: R (>= 3.3.3), yesno, gtools, zoo, ggplot2, reshape2, stats,
+        utils
 License: GPL (>= 2)
 URL: http://www.math.rug.nl/stat/Main/HomePage
-NeedsCompilation: yes
+Packaged: 2017-12-18 12:59:49 UTC; balaf
+Maintainer: Spyros Balafas <s.balafas@rug.nl>
 Repository: CRAN
-Packaged: 2017-03-30 14:26:20 UTC; balaf
-Date/Publication: 2017-03-30 16:36:48 UTC
+NeedsCompilation: no
+Author: Spyros Balafas [aut, cre],
+  Wim Krijnen [aut],
+  Wendy Post [ctr],
+  Ernst Wit [aut]
+Date/Publication: 2017-12-18 14:04:10 UTC

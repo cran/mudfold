@@ -1,33 +1,65 @@
-mudfoldsim <- function(items=8, sample.size=1000, pgamma1=5, pgamma2=-10, zeros=FALSE){
+mudfoldsim <- function(p=p, n=n, gamma1=5, gamma2=-10, zeros=FALSE,parameters="normal",seed=NULL){
+  if (!is.null(seed)){
+    set.seed(seed)
+  }
   if(zeros==TRUE){ 
-    p <- items; n <- sample.size
-    beta <- rnorm(p); theta <- rnorm(n)
-    beta <-sort(beta); theta <- sort(theta)
-    gamma1 <- pgamma1; gamma2 <- pgamma2; X <- Pma <- matrix(NA,n,p)
+    beta <- rnorm(p);beta <-sort(beta)
+    if (parameters=="normal") theta <- rnorm(n)
+    if (parameters=="uniform") theta <- runif(n,min = min(beta),max = max(beta))
+    theta <- sort(theta)
+    gamma1 <- gamma1; gamma2 <- gamma2; X <- Pma <- matrix(NA,n,p)
     for(i in 1:n){
       Pma[i,] <- (1+ exp(-gamma1-gamma2*(theta[i] - beta)^2))^{-1}
       X[i,] <- rbinom(p,1,Pma[i,])
     } 
-    dimnames(X)[[2]] <- LETTERS[1:p]
-    sim.data <-list(df=as.data.frame(X), item.patameters=beta,subject.parameters=theta)
+    rnk <- 1:p
+    dim2 <- NA
+    if (p <= 26) dim2 <- LETTERS[rnk] else dim2 <- as.character(rnk)
+    dimnames(X)[[2]] <- dim2
+    dimnames(Pma)[[2]] <- dim2
+    names(rnk) <- dim2
+    nam <- sample(dim2)
+    X <- X[,nam]
+    Prob <- Pma[,nam]
+    sim.data <-list(obs_ord=nam,true_ord=dim2,items=p, sample=n,gamma1=gamma1,gamma2=gamma2,seed=seed,
+                    dat=as.data.frame(X),probs=Prob,item.patameters=beta[as.numeric(rnk[nam])],subject.parameters=theta)
     return(sim.data)
   }
   if(zeros==FALSE){ 
-    p <- items; n <- 10*sample.size
-    beta <- rnorm(p); theta <- rnorm(n)
-    beta <-sort(beta); theta <- sort(theta)
-    gamma1 <- pgamma1; gamma2 <- pgamma2; X <- Pma <- matrix(NA,n,p)
+    n1 <- n
+    n <- 10*n
+    beta <- rnorm(p);beta <-sort(beta)
+    if (parameters=="normal") theta <- rnorm(n)
+    if (parameters=="uniform") theta <- runif(n,min = min(beta),max = max(beta))
+    theta <- sort(theta)
+    X <- Pma <- matrix(NA,n,p)
     for(i in 1:n){
       Pma[i,] <- (1+ exp(-gamma1-gamma2*(theta[i] - beta)^2))^{-1}
       X[i,] <- rbinom(p,1,Pma[i,])
     } 
-    Amat<-cbind(X,theta);TotalScore<-apply(X,1,sum)
-    Emat<-Amat[TotalScore!=0,]
-    Kmat<-Emat[sample(nrow(Emat), sample.size), ]
+    Amat<-cbind(X,theta)
+    Prob <- Pma
+    TotalScore<-apply(X,1,sum)
+    indx0 <- which(TotalScore!=0)
+    Emat <- Amat[indx0,]
+    Prob <- Pma[indx0,]
+    sampling <- sample(nrow(Emat), n1)
+    Kmat <- Emat[sampling, ]
+    Prob <- Prob[sampling,]
     or<-order(Kmat[,p+1],decreasing = FALSE)
-    X<-Kmat[or,1:p];dimnames(X)[[2]] <- LETTERS[1:p]
-    X <- X[,sample(LETTERS[1:p])]
-    sim.data <-list(df=as.data.frame(X), item.patameters=beta,subject.parameters=Kmat[or,p+1])
+    rnk <- 1:p
+    X<-Kmat[or,rnk]
+    Prob <- Prob[or,]
+    dim2 <- NA
+    if (p <= 26) dim2 <- LETTERS[rnk] else dim2 <- as.character(rnk)
+    dimnames(X)[[2]] <- dim2
+    dimnames(Prob)[[2]] <- dim2
+    names(rnk) <- dim2
+    nam <- sample(dim2)
+    X <- X[,nam]
+    sim.data <-list(obs_ord=nam,true_ord=dim2,items=p, sample=n1,gamma1=gamma1,gamma2=gamma2,seed=seed,
+                    dat=as.data.frame(X),probs=Prob[,nam], item.patameters=beta[as.numeric(rnk[nam])],
+                    subject.parameters=Kmat[or,p+1])
     return(sim.data)
   }
 }

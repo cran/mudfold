@@ -1,8 +1,8 @@
 
 
-import( "gtools", "zoo", "ggplot2", "reshape2","stats","utils")
+import( "yesno","gtools", "zoo", "ggplot2", "reshape2","stats","utils")
 
-export( mudfold, mudfoldsim, summary.mdf, print.mdf, plot.mdf)
+export( mudfold, mudfoldsim, as.mudfold, pick, summary.mdf, print.mdf, plot.mdf)
 
 S3method( "summary", "mdf" )
 S3method( "plot",    "mdf" )
