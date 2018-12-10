@@ -1,7 +1,7 @@
 \name{mudfoldsim}
 \alias{mudfoldsim}
 
-\title{Function for constructing artificial item response data generated under a proximity response process.
+\title{Function for constructing artificial item response data generated under an unfolding response process. Unfolding processes model the proximity (distance) between person and item parameters.
 }
 
 \description{
@@ -11,11 +11,11 @@
 
 
 \usage{
-mudfoldsim(p=p,n=n,gamma1=5,gamma2=-10,zeros=FALSE,parameters="normal",seed=NULL)
+mudfoldsim(N, n, gamma1=5, gamma2=-10, zeros=FALSE, parameters="normal", seed=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-\item{p}{: This argument specifies the number of items (stimuli).
+\item{N}{: This argument specifies the number of items (stimuli).
 }
 \item{n}{: Argument which allows the user to specify the number of respondents in the simulated data. 
 }
@@ -33,7 +33,7 @@ mudfoldsim(p=p,n=n,gamma1=5,gamma2=-10,zeros=FALSE,parameters="normal",seed=NULL
 
 
 \details{
-For simulating the response of an individual \eqn{i} with scale parameter \eqn{\theta_i} to an item \eqn{j} with scale parameter \eqn{\beta_j} we use the function \eqn{P(X_j =1 \mid \theta_i, \beta_j)=\frac{1}{1+e^{-\gamma_1 -\gamma_2(\theta_i - \beta_j)^2}}}. The parameters \eqn{\theta_i, \beta_j} are sampled from a standard normal distribution, i.e., \eqn{\theta \sim \mathcal{N}(0,1)}, and \eqn{\beta \sim \mathcal{N}(0,1)}.
+For simulating the response of an individual \eqn{i} with scale parameter \eqn{\theta_i} to an item \eqn{j} with scale parameter \eqn{\beta_j} we use the function \eqn{P(X_j =1 \mid \theta_i, \beta_j)=\frac{1}{1+e^{-\gamma_1 -\gamma_2(\theta_i - \beta_j)^2}}}. The parameters \eqn{\theta_i, \beta_j} can be samples sampled both from a standard normal distribution, i.e., \eqn{\theta \sim \mathcal{N}(0,1)}, and \eqn{\beta \sim \mathcal{N}(0,1)} or the the person parameters will be sampled uniformly within the range of the item parameters.
 }
 
 \value{a list with 11 components. 
@@ -84,11 +84,11 @@ data. Methodika.
 
 n.seed <- 10
 
-sim1 <- mudfoldsim(p=6, n=100, gamma1=5, gamma2=-10, zeros=FALSE,seed=n.seed)
-sim2 <- mudfoldsim(p=10,n=1000,gamma1=10,gamma2=-100,zeros=FALSE,seed=n.seed)
-sim3 <- mudfoldsim(p=15,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
-sim4 <- mudfoldsim(p=30,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
-sim5 <- mudfoldsim(p=50,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
+sim1 <- mudfoldsim(N=6, n=100, gamma1=5, gamma2=-10, zeros=FALSE,seed=n.seed)
+sim2 <- mudfoldsim(N=10,n=1000,gamma1=10,gamma2=-100,zeros=FALSE,seed=n.seed)
+sim3 <- mudfoldsim(N=15,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
+sim4 <- mudfoldsim(N=30,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
+sim5 <- mudfoldsim(N=50,n=2000,gamma1=50,gamma2=-100,zeros=FALSE,seed=n.seed)
 
 
 dat1 <- sim1$dat

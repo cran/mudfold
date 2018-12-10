@@ -1,20 +1,14 @@
-Err_obs_item <-function(X,K=K,n=n,J=J,O=O){
+Err_obs_item <-function(X,index=NULL,O){
+  J <- colnames(X)
   nn <- length(J)
   cmbf <- combinations(n=nn, r=3, v=J, set=FALSE, repeats.allowed=FALSE)
-  ncm <- nrow(cmbf)
   obs <- NULL
-  for (i in 1 : nn){
-    ind <- NULL;vind <- NULL
-    ind <- J[i]
-    for (g in 1:ncm){
-      if (ind %in% cmbf[g,]){
-        vind <- c(vind,g)
-      }
+  if (is.null(index)){
+    for (iter in 1:nn){
+      obs <- c(obs,sum(O[cmbf[which(apply(cmbf,1, function(x) J[iter] %in%x)),]]))
     }
-    tind <- NULL;Oind <- NULL
-    tind <- cmbf[vind,]
-    Oind <- sum(O[tind])
-    obs <- c(obs,Oind)
+  }else{
+    obs <- c(obs,sum(O[cmbf[which(apply(cmbf,1, function(x) index %in%x)),]]))
   }
   return(obs)
 }

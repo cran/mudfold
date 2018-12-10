@@ -1,20 +1,14 @@
-Err_exp_item <- function(X,K=K,n=n,J=J,EO=EO){
+Err_exp_item <- function(X,index=NULL,EO){
+  J <- colnames(X)
   nn<-length(J)
   cmbf<-combinations(n=nn, r=3, v=J, set=FALSE, repeats.allowed=FALSE)
-  ncm<-nrow(cmbf)
-  expe<-vector()
-  for (i in 1 : nn){
-    ind <- NULL;vind <- NULL
-    ind <- J[i]
-    for (g in 1:ncm){
-      if (ind %in% cmbf[g,]){
-        vind <- c(vind,g)
-      }
+  expe <- NULL
+  if (is.null(index)){
+    for (iter in 1:nn){
+      expe <- c(expe,sum(EO[cmbf[which(apply(cmbf,1, function(x) J[iter] %in%x)),]]))
     }
-    tind <- NULL;EOind <- NULL
-    tind <- cmbf[vind,]
-    EOind <- sum(EO[tind])
-    expe <- c(expe,EOind)
+  }else{
+    expe <- c(expe,sum(EO[cmbf[which(apply(cmbf,1, function(x) index %in%x)),]]))
   }
   return(expe)
 }

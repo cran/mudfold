@@ -1,84 +1,113 @@
-mudfold_se <- function(x,estimation=estimation,first.step=first.step,lambda1=lambda1,lambda2=lambda2,ls=ls){
-  X<-x
-  strt.indx <- as.character(first.step$strt.indx)
-  rmn.indx <- first.step$rmn.indx
-  n.itr <- first.step$n.itr
-  K <- ls$K
-  n <- ls$n
-  J <- ls$J
-  itr <- NULL
-  for (e in 1 : n.itr){
-    lstrt <- length(strt.indx);lrmn <- length(rmn.indx)
-    indxi <- rep(seq(1,(lstrt+1)),lrmn)
-    el <- rep(rmn.indx,each=lstrt+1)
-    appd<-NULL
-    for (i in 1:length(indxi)) appd[[i]] <- append(strt.indx,el[i],after = indxi[i]-1)
-    cmbns<-lapply(appd,function(x) combinations(n=length(x), r=3, v=x, set=FALSE, repeats.allowed=FALSE))
-    cmbns.chs <- lapply(cmbns,function(x) apply(x, 1, function(r) any(r %in% rmn.indx)))
-    for (j in 1:max(1,length(cmbns))) cmbns[[j]] <- cmbns[[j]][cmbns.chs[[j]],]
-    unl <- unlist(lapply(cmbns,function(x) sum(ls$H_hjk[x]>lambda2)==nrow(x)))
-    admit <- appd[unl]
-    if (sum(unl)==0) break
-    admissible <- matrix(unlist(admit), ncol = lstrt+1, byrow = TRUE)
-    freq.indx <- table(admissible)
-    un.index <- names(freq.indx[which(freq.indx==min(freq.indx))])
-    lngth <- length (un.index)
-    mtind <- apply(admissible,1,function(r) any(r %in% un.index))
-    nm <- matrix(admissible[mtind,],ncol = lstrt+1)
-    nrnmt <- nrow(nm)
-    if (is.null(nrnmt)) break
-    HS <- apply(nm,1,function(x){
-      df <- X[,x]
-      hi <- Hitem(df,K=ncol(df),J=colnames(df),n=nrow(df),EO=ls$EO,O=ls$O)
-      names(hi)<- x
-      index <- x[!x %in% strt.indx]
-      cand.it <- as.numeric(hi[index])
-      cand.it})
-    Hs.max <- max(HS)
-    if (Hs.max < lambda1)  break
-    nfitr <- length(HS)
-    for (x in 1 : nfitr) {
-      if (HS[x] == Hs.max) {
-        strt.indx <- nm[x,]
-        rmn.indx <- J[!J %in% strt.indx]
-        itr <- e
+mudfold_se <- function(out){
+  out_list <- out
+  data <- out_list$CALL$data
+  lambda1 <- out_list$CALL$lambda1
+  lambda2 <- out_list$CALL$lambda2
+  hcoeft <- out_list$MUDFOLD_INFO$triple_stats$H_coefficients
+  obserr <- out_list$MUDFOLD_INFO$triple_stats$Observed_errors
+  experr <- out_list$MUDFOLD_INFO$triple_stats$Expected_errors
+  estimation <- out_list$CALL$estimation
+  
+  N <- out_list$DESCRIPTIVES$n_items_final
+  I <- out_list$DESCRIPTIVES$item_names_final 
+  
+  list_res <- list()
+  list_res <- out_list
+  list_res$MUDFOLD_INFO$second_step <-list()
+  list_res$MUDFOLD_INFO$second_step$Converged <- FALSE
+  if (is.null(list_res$CALL$start)) b_unq <- list_res$MUDFOLD_INFO$first_step$BU[1,]
+  
+  if (!is.null(list_res$CALL$start)){
+    list_res$MUDFOLD_INFO$first_step$Converged <- "SKIPPED"
+    b_unq <- list_res$CALL$start
+    list_res$MUDFOLD_INFO$first_step$BU <- b_unq
+  } 
+  if (is.null(b_unq)) return()
+  
+  reit <- I[!I %in% b_unq]
+  Nstar <- length(b_unq)
+  for (iter in 1:(N-Nstar)){
+    ## Create indices to be used in constructing scales
+    index_rep <- rep(seq(1,(length(b_unq)+1)),length(reit))
+    index_irep <- rep(reit, each=length(b_unq)+1)
+    
+    ## Construct the possible  scales to be investigated in each "iter"
+    all_scales <- lapply(1:length(index_rep), 
+                         function(i) append(b_unq,index_irep[i],after = index_rep[i]-1))
+    
+    ## Check which scales fulfill the first criterion.
+    first_criterion <- lapply(all_scales, function(x){
+      cmbnts <- combinations(n=length(x), r=3, v=x, set=FALSE, repeats.allowed=FALSE)
+      indexes <- apply(cmbnts,1, function(y) any(y %in% reit))
+      used_cmbs <- cmbnts[indexes,]
+      if(sum(hcoeft[used_cmbs] > lambda2) == nrow(used_cmbs)) return(x) 
+    })
+    first_criterion <- first_criterion[!sapply(first_criterion,is.null)]
+    
+    ## If no scales fulfill the first criterion stop.
+    if (length(first_criterion) ==0) break # If FALSE
+    
+    ## Check if scales fulfill the second criterion.
+    min_seccri <- names(table(unlist(first_criterion))[table(unlist(first_criterion))==min(table(unlist(first_criterion)))])
+    indexes <- sapply(first_criterion,function(x) any(x %in% min_seccri))
+    second_criterion <- first_criterion[indexes]
+    
+    ## If no scales fulfill the second criterion stop.
+    if (length(second_criterion) ==0) break # If FALSE
+    
+    ## Check if scales fulfill the third criterion.
+    thirdcri <- sapply(second_criterion,function(x){
+      Hitem(data[,x],EO=experr, O=obserr)[!x%in%b_unq]
+    })
+    
+    ## If no scales fulfill the third criterion stop.
+    if (max(thirdcri) < lambda1) break # If FALSE
+    which_max_h <- which(thirdcri==max(thirdcri))
+    
+    ## Additional step
+    if (length(which_max_h) > 1){
+      crit3 <- second_criterion[which_max_h]
+      tcrit3 <- table(unlist(crit3))
+      icrit3 <- names(tcrit3)[tcrit3 == min(tcrit3)]
+      lcrit3 <- sapply(crit3,function(x) any(icrit3 %in% x))
+      if (sum(lcrit3) == 1) third_criterion <- crit3[lcrit3]
+      if (sum(lcrit3) > 1){
+        crit31 <- sapply(crit3[lcrit3],function(x) Err_exp_item(data[,x],EO=experr)[!x%in%b_unq])
+        third_criterion <- crit3[lcrit3][which.min(crit31)]
       }
+    }else{
+      third_criterion <- second_criterion[which_max_h]
     }
+    
+    ## Determine best scale in each iter and items remaining.
+    b_unq <- third_criterion[[1]]
+    reit <- reit[!reit%in%b_unq]
+    list_res$MUDFOLD_INFO$second_step$Converged <- TRUE
   }
-  data_end <- X[,strt.indx]
-  K <- ncol(data_end)
-  n <- nrow(data_end)
-  J <- colnames(data_end)
-  dimnames(data_end) <- list(1:n,strt.indx)
-  scale_length <- length(strt.indx)
-  pj <- ls$p[strt.indx]
-  Cndadj <- CADJ(data_end,K=K,n=n,J=J)
-  Corrlt <- cor(data_end)
-  Adjcnc <- ADJ(data_end,K=K,n=n,J=J)
-  Domnce <- DOM(data_end,K=K,n=n,J=J)
-  items.rejected <- rmn.indx
+  list_res$MUDFOLD_INFO$second_step$scale <- b_unq
+  list_res$MUDFOLD_INFO$second_step$excluded_items <- reit
+  list_res$MUDFOLD_INFO$second_step$Lscale <- length(b_unq)
+  list_res$MUDFOLD_INFO$second_step$COND_ADJ <- CADJ(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$CORR <- cor(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$ADJ <- ADJ(data[,b_unq]) 
+  list_res$MUDFOLD_INFO$second_step$DOM <- DOM(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$Hscale <- Hscale(data[,b_unq],EO=experr,O=obserr)
+  list_res$MUDFOLD_INFO$second_step$Hitem <- Hitem(data[,b_unq],EO=experr,O=obserr)
+  #list_res$MUDFOLD_INFO$second_step$H_minus_item <- Hscalej(data[,b_unq],EO=experr,O=obserr)
+  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$ISOscale <- sum(list_res$MUDFOLD_INFO$second_step$ISOitem)
+  list_res$MUDFOLD_INFO$second_step$OBSitem <- Err_obs_item(data[,b_unq],O=obserr)
+  list_res$MUDFOLD_INFO$second_step$OBSscale<- Err_obs_scale(data[,b_unq],O=obserr)
+  list_res$MUDFOLD_INFO$second_step$EXPitem <- Err_exp_item(data[,b_unq],EO=experr)
+  list_res$MUDFOLD_INFO$second_step$EXPscale<- Err_exp_scale(data[,b_unq],EO=experr)
   if (estimation=="rank"){
-    estimates <- param_est(data_end,method = "rank")
-    estimates$betas <- estimates$betas[strt.indx]
+    list_res$MUDFOLD_INFO$second_step$estimates <- param_est(data[,b_unq],method = "rank")
+    list_res$MUDFOLD_INFO$second_step$estimates$betas <- list_res$MUDFOLD_INFO$second_step$estimates$betas[b_unq]
   }else{
-    estimates <- param_est(data_end,method = "quantile")
-    estimates$betas <- estimates$betas[strt.indx]
+    list_res$MUDFOLD_INFO$second_step$estimates <- param_est(data[,b_unq],method = "quantile")
+    list_res$MUDFOLD_INFO$second_step$estimates$betas <- list_res$MUDFOLD_INFO$second_step$estimates$betas[b_unq]
   }
-  Obserr <- Err_obs_item(data_end,K=K,n=n,J=J,O=ls$O)
-  Experr <- Err_exp_item(data_end,K=K,n=n,J=J,EO=ls$EO)
-  Hitem1 <- Hitem(data_end,K=K,n=n,J=J,EO=ls$EO,O=ls$O)
-  Isoitm <- ISO(Cndadj)
-  Obsers <- Err_obs_scale(data_end,vec=J,o=ls$O)
-  Expers <- Err_exp_scale(data_end,vec=J,exp=ls$EO)
-  Hscals <- Hscale(data_end,vec=J,EO=ls$EO,O=ls$O)
-  Isotot <- sum(Isoitm)
-  star_mat <- CAM_STAR(Cndadj)
-  m1 <- list(dat = x, starting.items = ls$J, no.items=ls$K, sample.size=ls$n, Best.triple = as.character(first.step$strt.indx), 
-             iterations.in.sec.step = itr, mdfld.order = strt.indx, length.scale=scale_length, item.popularities = pj, item.freq=ls$obs_frq[strt.indx],
-             Obs.err.item = Obserr, Exp.err.item = Experr,H.item = Hitem1 , Item.ISO = Isoitm , Obs.err.scale = Obsers,
-             Exp.err.scale = Expers, Htotal = Hscals, Isototal = Isotot,Dominance.matrix = Domnce, star=star_mat, 
-             Adjacency.matrix = Adjcnc,Correlation.matrix = Corrlt, Cond.Adjacency.matrix = Cndadj, uniq= first.step$unq.trp, 
-             est.parameters=estimates,call=ls$call)
-  class(m1) <- "mdf"
-  return(m1)
+  class(list_res) <- "mdf"
+  return(list_res)
 }

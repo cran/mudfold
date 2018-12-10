@@ -1,9 +1,15 @@
 
-
-import( "yesno","gtools", "zoo", "ggplot2", "reshape2","stats","utils")
-
-export( mudfold, mudfoldsim, as.mudfold, pick, summary.mdf, print.mdf, plot.mdf)
-
 S3method( "summary", "mdf" )
 S3method( "plot",    "mdf" )
 S3method( "print",   "mdf" )
+export("mudfold", "mudfoldsim", "as.mudfold", "pick")
+import("ggplot2")
+import("boot")
+importFrom("gtools", "combinations")
+importFrom("zoo", "na.approx")
+importFrom("reshape2", "melt")
+importFrom("stats", "cor", "na.omit", "rbinom", "rnorm", "runif","var","density")
+
+
+
+

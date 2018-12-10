@@ -1,5 +1,6 @@
-Err_obs_scale <-function(X,vec=vec,o=o){
-  l_vec <- length(vec)
-  cmb1 <- combinations(n=l_vec, r=3, v=vec, set=FALSE, repeats.allowed=FALSE)
-  return(sum(o[cmb1]))
+Err_obs_scale <-function(X,O){
+  s <- colnames(X)
+  l_vec <- length(s)
+  cmb1 <- combinations(n=l_vec, r=3, v=s, set=FALSE, repeats.allowed=FALSE)
+  return(sum(O[cmb1]))
 }

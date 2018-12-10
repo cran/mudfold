@@ -4,50 +4,29 @@
 \title{ Function for calculating MUDFOLD statistics for a given unfolding scale.
 }
 \description{
-This function calculates the MUDFOLD statistics for proximity item response data, whose columns are assumed to be ordered to the order they are provided. The resulting object from the \code{as.mudfold} function is an object of S3 class \code{.mdf}, for which generic functions \code{print}, \code{summary}, and \code{plot} are available.
+This function calculates the MUDFOLD statistics for data whose columns are assumed to be ranked to the order they are provided. The resulting object from the \code{as.mudfold} function is an object of S3 class \code{"mdf"}, for which generic functions \code{print}, \code{summary}, and \code{plot} are available.
 }
 \usage{
-as.mudfold(x,estimation="rank")
+as.mudfold(data,estimation="rank")
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
- \item{x}{: A binary matrix or data frame containing the responses of \code{nrow(x)} persons
-to \code{ncol(x)} items. Missing values in \code{x} are not allowed.
+ \item{data}{: A binary \code{matrix} or \code{data.frame} containing the responses of \code{nrow(data)} persons
+to \code{ncol(data)} items. Missing values in \code{data} are not allowed.
 }
-\item{estimation}{: This argument controls the nonparametric estimation method for item and subject locations. By deafult this argument equals to \code{"rank"} and implies that a Van Schuur's rank based estimator will be used for estimating the item parameters which are later used as thresholds in order to estimate subject 's parameters. The user can set this argument to \code{"quantile"} and then an estimator based on item rank quantiles proposed by Johnson is applied.
+\item{estimation}{: This argument controls the nonparametric estimation method for person locations. By deafult this argument equals to \code{"rank"} and implies that Van Schuur's estimator will be used in order to infer the person parameters. The user can set this argument to \code{"quantile"} and then an estimator proposed by Johnson is applied.
 }
 }
 \details{
-The function \code{as.mudfold} calculates MUDFOLD statistics for a given scale. Descriptive statistics, scalability coefficients, iso statistic values, are calculated and the user can obtain a summary table with the \code{summary} function which is designed for \code{.mdf} class objects.
+The function \code{as.mudfold} calculates MUDFOLD statistics for a given scale. Descriptive statistics, observed errors, expected errors, scalability coefficients, iso statistic values, are calculated for items and the scale. The user can obtain a summary table for the given scale with the \code{summary} function which is designed for \code{"mdf"} class objects.
 }
+
 \value{
-The function \code{as.mudfold} returns a list object of class \code{mdf} with the same components as the core function \code{mudfold} except the information that concerns the item selection algorithm. The list contains the following:
-  \item{dat}{The data in which MUDFOLD method has been fitted.}
-  \item{starting.items}{The starting set of items.}
-  \item{no.items}{The number of items in the starting set (i.e., equal to \code{ncol(x)}).}
-  \item{sample.size}{The number of respondents.}
-  \item{Best.triple}{\code{NA}}
-  \item{iterations.in.sec.step}{\code{NA}}
-  \item{mdfld.order}{The item order on the unidimensional scale.}
-  \item{length.scale}{The number included in the scale (\code{length(mdfld.order})).}
-  \item{item.popularities}{Observed proportion of positive responses for the items included in the scale.}
-  \item{item.freq}{Observed frequency of positive responses for the items in MUDFOLD scale.}
-  \item{Obs.err.item}{Observed response errors for each item included in the scale.}
-  \item{Exp.err.item}{Expected response errors for each item included in the scale.}
-  \item{H.item}{Scalability coefficient for each item included in the scale.}
-  \item{Item.ISO}{Iso statistic for each item included in the scale.}
-  \item{Obs.err.scale}{Observed response errors for the estimated scale.}
-  \item{Exp.err.scale}{Expected response errors for the estimated scale}
-  \item{Htotal}{Scalability coefficient for the estimated scale.}
-  \item{Isototal}{Iso statistic for the estimated scale.}
-  \item{Cond.Adjacency.matrix}{Conditional adjacency matrix (CAM) for the estimated scale.}
-  \item{Adjacency.matrix}{Adjacency matrix for the estimated scale.}
-  \item{Dominance.matrix}{Dominance matrix for the MUDFOLD scale.}
-  \item{star}{A matrix with stars placed at the maxima locations of each row of the conditional adjacency matrix. }
-  \item{Correlation.matrix}{Correlation matrix for the MUDFOLD scale.}
-  \item{uniq}{The set of unique triples. From this set, the best minimal scale for the first step of the item selection algorithm is determined.}
-  \item{est.parameters}{A list with two components. The first component refers to item parameters and the other to the subject parameters. The estimates have been obtained with a user specified nonparametric estimation method.}
-  \item{call}{The function call.}
+The function \code{as.mudfold} returns a list with the same components as the \code{mudfold} function except the information that concerns the item selection algorithm. The list contains the following:
+  \item{CALL}{A list where its components provide information for the function call.}
+  \item{CHECK}{A list where its components provide information from the data checking step.}
+  \item{DESCRIPTIVES}{A list with descriptive statistics for the \code{data}.}
+  \item{MUDFOLD_INFO}{A list with three main components. The first component is called \code{triple_stats} and is a list where in each element contains the observed errors, expected errors, and scalability coefficients for each item triple. The second element is called \code{first_step} and informs the user that the first step of the item selection algorithm is not applied in the \code{as.mudfold} function. The third element of this list is called \code{second_step}  and is also a list with the MUDFOLD statistics and parameter estimates for the given scale.}
 }
 
 \author{Spyros E. Balafas (auth.), Wim P. Krijnen (auth.), Wendy J. Post (contr.), Ernst C. Wit (auth.)
@@ -76,7 +55,7 @@ M.S. Johnson. (2006). Nonparametric Estimation of Item and Respondent Locations 
 n.seed <- 11
 
 ## Simulate an unfolding scale
-simulation <- mudfoldsim(p=6, n=100, gamma1=5, gamma2=-10, zeros=FALSE,seed=n.seed)
+simulation <- mudfoldsim(N=6, n=100, seed=n.seed)
 
 ## get the data
 dat <- simulation$dat
@@ -84,16 +63,16 @@ dat <- simulation$dat
 ## true order
 true_order <- simulation$true_ord
 
-## check MUDFOLD statistics for the simulated order
-mud_stats1 <- as.mudfold(dat,estimation="rank")
+## check MUDFOLD statistics for the random simulated rank order
+mud_stats1 <- as.mudfold(dat)
 
-# get the summary table
+# get the summary 
 summary(mud_stats1)
 
-## check MUDFOLD statistics for the true item order
-mud_stats2 <- as.mudfold(dat[,true_order],estimation="rank")
+## check MUDFOLD statistics for the true item rank order
+mud_stats2 <- as.mudfold(dat[,true_order])
 
-# get the summary table
+# get the summary for the true item rank order
 summary(mud_stats2)
 }
 }

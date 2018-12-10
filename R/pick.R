@@ -1,10 +1,12 @@
-pick <- function(x,k=NULL,cutoff=NULL,byItem=FALSE){
+pick <- function(data, k=NULL, cutoff=NULL, byItem=FALSE){
+  x <- data
+  if (is.null(byItem)) byItem <- FALSE
   isfactor <- sapply(x,is.factor)
   if(any(isfactor)){
     fac_itm <- which(isfactor)
     dd <- x[fac_itm]
     options(warn=-1)
-    xx<-sapply(dd,function(x){as.numeric(as.character(x))})
+    xx <- sapply(dd, function(x){as.numeric(as.character(x))})
     options(warn=0)
     # The following deals with the case that the columns are ordered categorical, but not in numerical-like values
     if(sum(is.na(xx))>0){xx<-sapply(dd,as.numeric)}

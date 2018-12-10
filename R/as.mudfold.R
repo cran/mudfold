@@ -1,42 +1,58 @@
-as.mudfold <- function(x,estimation="rank"){
-  call=match.call()
-  X <- data_check(x)
-  data_end <- X
-  strt.indx <- colnames(data_end)
-  info <- data_info(data_end,call=call)
-  K <- info$K
-  n <- info$n
-  J <- info$J
-  dimnames(data_end) <- list(1:n,strt.indx)
-  scale_length <- length(strt.indx)
-  pj <- apply(data_end,2, function(x) sum(x) / length(x))
-  Cndadj <- CADJ(data_end,K=K,n=n,J=J)
-  Corrlt <- cor(data_end)
-  Adjcnc <- ADJ(data_end,K=K,n=n,J=J)
-  Domnce <- DOM(data_end,K=K,n=n,J=J)
+as.mudfold <- function(data,estimation="rank"){
+  call <- match.call()
+  start_time <- as.POSIXct(Sys.time())
+  out_list <- list()
+  out_list$CALL <- list()
+  out_list$CALL$data <- data
+  out_list$CALL$match.call <- call
+  out_list$CALL$estimation <- estimation
+  out_list$CALL$method <- "as.mudfold()"
+  
+  ################################# CHECK THE DATA ###################################
+  ####################################################################################
+  check_result <- data_check(out_list)
+  if (is.null(check_result)) return()
+  out_list <- check_result$out
+  out_list$CALL$data <- check_result$data
+  out_list$CALL$lambda1 <- "-"
+  out_list$CALL$lambda2 <- "-"
+  
+  out_list$MUDFOLD_INFO$first_step$Converged <- "SKIPPED"
+  out_list$MUDFOLD_INFO$second_step$Converged <- "SKIPPED"
+  
+  ########################## CALCULATE MUDFOLD STATISTICS ############################
+  ####################################################################################
+  
+  hcoeft <- out_list$MUDFOLD_INFO$triple_stats$H_coefficients
+  obserr <- out_list$MUDFOLD_INFO$triple_stats$Observed_errors
+  experr <- out_list$MUDFOLD_INFO$triple_stats$Expected_errors
+  estimation <- out_list$CALL$estimation
+  
+  b_unq <- colnames(out_list$CALL$data)
+  list_res <- out_list
+  list_res$MUDFOLD_INFO$second_step$scale <- b_unq
+  list_res$MUDFOLD_INFO$second_step$Lscale <- length(b_unq)
+  list_res$MUDFOLD_INFO$second_step$COND_ADJ <- CADJ(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$CORR <- cor(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$ADJ <- ADJ(data[,b_unq]) 
+  list_res$MUDFOLD_INFO$second_step$DOM <- DOM(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$Hscale <- Hscale(data[,b_unq],EO=experr,O=obserr)
+  list_res$MUDFOLD_INFO$second_step$Hitem <- Hitem(data[,b_unq],EO=experr,O=obserr)
+  #list_res$MUDFOLD_INFO$second_step$H_minus_item <- Hscalej(data[,b_unq],EO=experr,O=obserr)
+  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$ISOscale <- sum(list_res$MUDFOLD_INFO$second_step$ISOitem)
+  list_res$MUDFOLD_INFO$second_step$OBSitem <- Err_obs_item(data[,b_unq],O=obserr)
+  list_res$MUDFOLD_INFO$second_step$OBSscale<- Err_obs_scale(data[,b_unq],O=obserr)
+  list_res$MUDFOLD_INFO$second_step$EXPitem <- Err_exp_item(data[,b_unq],EO=experr)
+  list_res$MUDFOLD_INFO$second_step$EXPscale<- Err_exp_scale(data[,b_unq],EO=experr)
   if (estimation=="rank"){
-    estimates <- param_est(data_end,method = "rank")
-    estimates$betas <- estimates$betas[strt.indx]
+    list_res$MUDFOLD_INFO$second_step$estimates <- param_est(data[,b_unq],method = "rank")
+    list_res$MUDFOLD_INFO$second_step$estimates$betas <- list_res$MUDFOLD_INFO$second_step$estimates$betas[b_unq]
   }else{
-    estimates <- param_est(data_end,method = "quantile")
-    estimates$betas <- estimates$betas[strt.indx]
+    list_res$MUDFOLD_INFO$second_step$estimates <- param_est(data[,b_unq],method = "quantile")
+    list_res$MUDFOLD_INFO$second_step$estimates$betas <- list_res$MUDFOLD_INFO$second_step$estimates$betas[b_unq]
   }
-  Obserr <- Err_obs_item(data_end,K=K,n=n,J=J,O=info$O)
-  Experr <- Err_exp_item(data_end,K=K,n=n,J=J,EO=info$EO)
-  Hitem1 <- Hitem(data_end,K=K,n=n,J=J,EO=info$EO,O=info$O)
-  Isoitm <- ISO(Cndadj)
-  Obsers <- Err_obs_scale(data_end,vec=J,o=info$O)
-  Expers <- Err_exp_scale(data_end,vec=J,exp=info$EO)
-  Hscals <- Hscale(data_end,vec=J,EO=info$EO,O=info$O)
-  Isotot <- sum(Isoitm)
-  star_mat <- CAM_STAR(Cndadj)
-  m1 <- list(dat = X, starting.items = info$J, no.items=info$K, sample.size=info$n, Best.triple = NA, 
-             iterations.in.sec.step = NA, mdfld.order = strt.indx, length.scale=scale_length, item.popularities = pj, item.freq=info$obs_frq[strt.indx],
-             Obs.err.item = Obserr, Exp.err.item = Experr,H.item = Hitem1 , Item.ISO = Isoitm , Obs.err.scale = Obsers,
-             Exp.err.scale = Expers, Htotal = Hscals, Isototal = Isotot,Dominance.matrix = Domnce, star=star_mat, 
-             Adjacency.matrix = Adjcnc,Correlation.matrix = Corrlt, Cond.Adjacency.matrix = Cndadj, uniq= NA, 
-             est.parameters=estimates, call=info$call)
-  class(m1) <- "mdf"
-  return(m1)
+  class(list_res) <- "mdf"
+  return(list_res)
 }
-

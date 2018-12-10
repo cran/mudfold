@@ -1,40 +1,62 @@
-mudfold_fs <- function(x,lambda1=lambda1,ls=ls){
-  X<-x
-  g<-combinations(n=ls$K, r=3, v=ls$J, set=FALSE)
-  g1<-g[,c(1,3,2)]
-  g2<-g[,c(2,1,3)]
-  Hhjk <- ls$H_hjk[g]
-  Hhkj <- ls$H_hjk[g1]
-  Hjhk <- ls$H_hjk[g2]
-  unq.hjk <-  g[(Hhjk > 0 & Hhkj < 0 & Hjhk <0 ),]
-  unq.hkj <- g1[(Hhjk < 0 & Hhkj > 0 & Hjhk < 0),]
-  unq.jhk <- g2[(Hhjk < 0 & Hhkj < 0 & Hjhk > 0),]
-  unq.all <- rbind (unq.hjk, unq.hkj, unq.jhk)
-  lam <- nrow(unq.all)
-  if( lam==0) {
-    print("Data cannot be unfolded. No unique triple has been found.")
+mudfold_fs <- function(out){
+  out_list <- out
+  dat <- out_list$CALL$data
+  hcoeft <- out_list$MUDFOLD_INFO$triple_stats$H_coefficients
+  lambda1 <- out_list$CALL$lambda1
+  
+  ####################################################################
+  ##### FIRST STEP IN ITEM SELECTION:Find the best unique triple #####
+  ####################################################################
+  perm1 <- combinations(n=ncol(dat), r=3, v=colnames(dat),set = FALSE)
+  perm2 <- perm1[,c(1,3,2)]
+  perm3 <- perm1[,c(2,1,3)]
+  
+  # find unique triples
+  unqtrip <- matrix(rbind(perm1[(hcoeft[perm1] > 0 & hcoeft[perm2] < 0 & hcoeft[perm3] < 0),],
+                          perm2[(hcoeft[perm1] < 0 & hcoeft[perm2] > 0 & hcoeft[perm3] < 0),],
+                          perm3[(hcoeft[perm1] < 0 & hcoeft[perm2] < 0 & hcoeft[perm3] > 0),]),ncol = 3)
+  
+  out_list$MUDFOLD_INFO$first_step <- list()
+  out_list$MUDFOLD_INFO$first_step$Converged <- FALSE
+  
+  # Stopping criterion 1
+  if (dim(unqtrip)[1] == 0){
+    print("MUDFOLD DIDN'T CONVERGE: No unique triples exist.")
     return()
-  }
-  dimnames(unq.all) <- list(1:nrow(unq.all),c("Index1", "Index2", "Index3"))
-  Hunq <- ls$H_hjk[unq.all]
-  ord <- order(Hunq, decreasing = TRUE)
-  names1 <- 1:lam
-  if (max(Hunq) < lambda1) {
-    print("Data cannot be unfolded, H(unique) < lower boundary")
+  } 
+  out_list$MUDFOLD_INFO$first_step$unique_triples <- unqtrip
+  out_list$MUDFOLD_INFO$first_step$H_unique_triples <- hcoeft[unqtrip]
+  
+  mHbunq <- max(out_list$MUDFOLD_INFO$first_step$H_unique_triples)
+  # Stopping criterion 2
+  if (mHbunq < lambda1){
+    print(paste("MUDFOLD DIDN'T CONVERGE: H(unique triple) < ",lambda1,".",sep=""))
     return()
+  }  
+  imax <- which(out_list$MUDFOLD_INFO$first_step$H_unique_triples==mHbunq)
+  
+  
+  ## Additional step
+  if (length(imax) > 1){
+    crit3 <- unqtrip[imax,]
+    tcrit3 <- table(crit3)
+    icrit3 <- names(tcrit3)[tcrit3 == min(tcrit3)]
+    lcrit3 <- apply(crit3,1,function(x) any(icrit3 %in% x))
+    if (sum(lcrit3) == 1) third_criterion <- crit3[lcrit3,]
+    if (sum(lcrit3) > 1){
+      crit31 <- apply(crit3[lcrit3,],1,function(x) out_list$MUDFOLD_INFO$triple_stats$Expected_errors[matrix(x,ncol = 3)])
+      third_criterion <- crit3[lcrit3,][which.min(crit31),]
+    }
+  }else{
+    third_criterion <- unqtrip[imax,]
   }
-  ord.unq.all <- matrix(NA,nrow = nrow(unq.all), ncol = ncol(unq.all))
-  dimnames(ord.unq.all) <- list(names1, c("v1","v2","v3"))
-  ord.unq.all <- unq.all[ord,]
-  if (is.null(nrow(ord.unq.all)))
-    bst.unq.trpl <- ord.unq.all
-  if (!is.null(nrow(ord.unq.all)))
-    bst.unq.trpl <- ord.unq.all[1,]
-  strtng.trpl <- bst.unq.trpl
-  J.star <- ls$J[! ls$J %in% strtng.trpl]
-  n.itr <- length(J.star)
-  strt.indx <- strtng.trpl
-  rmn.indx <- J.star
-  return(list(strt.indx = strt.indx, rmn.indx =rmn.indx , n.itr = n.itr,
-              unq.trp = ord.unq.all))
+  out_list$MUDFOLD_INFO$first_step$Converged <- TRUE
+  out_list$MUDFOLD_INFO$first_step$BU <- matrix(third_criterion,ncol=3)
+  out_list$MUDFOLD_INFO$first_step$HBU <- mHbunq
+  if (is.null(nrow(out_list$MUDFOLD_INFO$first_step$BU))){
+  }else{
+    out_list$MUDFOLD_INFO$first_step$maxiter_sec <- nrow(out_list$MUDFOLD_INFO$first_step$BU)
+    
+  }
+  return(out_list)
 }

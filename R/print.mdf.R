@@ -1,47 +1,59 @@
-print.mdf <- function(x, Item.info= FALSE, Diagnostics=FALSE, ...){
+print.mdf <- function(x, ...){
   cat("\nCall: ")
-  print(x$call,...)
-  cat("\nIndividuals:", x$sample.size,"\n")
-  cat("\nItems:", x$no.items,"\n")
-  cat("\nItem set:",x$starting.items,"\n")
-  cat("Best unique triple:",x$Best.triple,"\n")
-  cat("Iterations in the second step:",x$iterations.in.sec.step,"\n")
-  cat("Unidimensional Mudfold scale:",x$mdfld.order,"\n")
-  cat("Total number of observed errors for the Mudfold scale:",x$Obs.err.scale,"\n")
-  cat("Total number of expected errors for the Mudfold scale:",x$Exp.err.scale,"\n")
-  cat("scalability H for the Mudfold scale:",x$Htotal,"\n")
-  cat("Iso statistic for the Mudfold scale:",x$Isototal,"\n")
-  if (Item.info == TRUE){
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Item Information:"  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    cat("Total number of observed errors per item in the Mudfold scale:",x$Obs.err.item,"\n")
-    cat("Total number of expected errors per item in the Mudfold scale:",x$Exp.err.item,"\n")
-    cat("scalability H per item in the Mudfold scale:",x$H.item,"\n")
-    cat("Iso statistic per item in the Mudfold scale:",x$Item.ISO,"\n")
-  }
-  
-  if (Diagnostics == TRUE){
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Diagnostics:"  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Dominance matrix for Mudfold order:"  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    print(x$Dominance.matrix,...)
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Adjacency matrix for Mudfold order:"  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    print(x$Adjacency.matrix,...)
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Correlation matrix for Mudfold scale:"  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    print(x$Correlation.matrix,...)
-    cat( paste(""), fill = TRUE )
-    cat( paste( "Conditional Adjacency matrix for Mudfold scale: ", x$ISO  ), fill = TRUE )
-    cat( paste(""), fill = TRUE )
-    print(x$Cond.Adjacency.matrix,...)
-  }
-  
+  print(x$CALL$match.call)
   cat("\n")
+  cat("Time elapsed:",x$CALL$elapsed_time," minutes \n")
+  if (length(x$CHECK$warnings)>0) invisible(sapply(unlist(unname(x$CHECK$warnings)),function(x) cat(paste("\nWarning:",x,sep = " "))))
+  cat("\n")
+  if (!is.null(x$CHECK$SAMPLE$missing_values$ndel_rows)){
+    cat("\nMissing values:","TRUE" )
+    cat("\nNumber of cases with missings:",x$CHECK$SAMPLE$missing_values$ndel_rows)
+    cat("\nTotal number of missings:",sum(x$CHECK$SAMPLE$missing_values$missing_rows),"\n")
+  } 
+  if (!is.null(x$CHECK$zero_responses$n_zero_persons)){
+    cat("\nZero responses:","TRUE")
+    cat("\nNumber of persons with zero responses:",x$CHECK$zero_responses$n_zero_persons)
+    cat("\nNumber of items with zero responses:",x$CHECK$zero_responses$n_zero_items,"\n")
+  } 
+  cat("\nIndividuals:", x$DESCRIPTIVES$n_persons_final)
+  cat("\nItems:", x$DESCRIPTIVES$n_items_final,"\n")
+  
+  cat("\nEstimation method:",x$CALL$estimation)
+  if (!is.null(x$CALL$start)) cat("\nStarting scale:",x$CALL$start)
+  cat("\nLambda1:",x$CALL$lambda1)
+  cat("\nLambda2:",x$CALL$lambda2,"\n")
+  
+  if (x$CALL$Bootstrap){
+    x$BOOTSTRAP$BOOT$t <- apply(x$BOOTSTRAP$BOOT$t,2,function(x){
+      vi <- x;v <- na.omit(x);lv <- length(v);vv <- unique(v);lvv <- length(vv)
+      if (lvv==1){
+        val <- ifelse(vv==1,0.99999,0.0000011)
+        ind <- sample(1:lv,max(1,round(lv/30)));v[ind] <- val
+        vi[!is.na(vi)] <-v
+      }
+      return(vi)
+    })
+    cat("Bootstrap:",ifelse(x$CALL$Bootstrap,"YES","NO"),"\n")
+    cat("Bootstrap replications:",x$CALL$nboot,"\n")
+  }
+  cat("\nFirst step completed:",x$MUDFOLD_INFO$first_step$Converged)
+  cat("\nSecond step completed: ",x$MUDFOLD_INFO$second_step$Converged,"\n")
+  if (x$MUDFOLD_INFO$second_step$Converged){
+    cat("\nscalability H for the MUDFOLD scale:",x$MUDFOLD_INFO$second_step$Hscale)
+    if (x$CALL$Bootstrap){
+      cat("\nBootstrap 95% percentile CI for the H coef:",
+          paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 1)$percent[,4:5],3),collapse = ", "),")",sep = ""))
+    }
+    cat("\nIso statistic for the MUDFOLD scale:",x$MUDFOLD_INFO$second_step$ISOscale)
+    if (x$CALL$Bootstrap){
+      cat("\nBootstrap 95% percentile CI for the ISO statistic:",
+          paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 2)$percent[,4:5],3),collapse = ", "),")",sep = ""),"\n")
+      cat("\nSummary of bootstrap iterations:\n")
+      print(summary(x$BOOTSTRAP$BOOT$t)[,1:2])
+    }
+    
+    cat("\n")
+  }else{
+    cat("\n")
+  }
 }
-

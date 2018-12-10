@@ -1,11 +1,14 @@
 plot_irf <- function(x,select=NULL,...){
   output <- character(0L)
-  output <- x$mdfld.order
-  nc <- x$length.scale
-  tcad <- t(x$Cond.Adjacency.matrix)
-  value=variable=Items=NULL
-  A <- cbind(as.matrix(na.approx(tcad)),1:nc);dimnames(A)<- list(1:nc, c(output,"index"))
-  A <- as.data.frame(A);d <- melt(A, id.vars="index");colnames(d) <- c("index","Items","value")
+  output <- x$MUDFOLD_INFO$second_step$scale
+  nc <- x$MUDFOLD_INFO$second_step$Lscale
+  tcad <- t(x$MUDFOLD_INFO$second_step$COND_ADJ)
+  value <- variable <-Items <- index <- NULL
+  A <- cbind(as.matrix(na.approx(tcad)),1:nc)
+  dimnames(A) <- list(1:nc, c(output,"index"))
+  A <- as.data.frame(A)
+  d <- melt(A, id.vars="index")
+  colnames(d) <- c("index","Items","value")
   
   if (is.null(select)){ 
     plot1 <- ggplot(d, aes(index,value, col=Items),...)+ geom_point() + geom_line(size=1)+ylab("Probability of positive response")+
@@ -17,10 +20,12 @@ plot_irf <- function(x,select=NULL,...){
                                       axis.title.y = element_text(angle=90,vjust =2),
                                       axis.title.x = element_text(vjust = -0.2),
                                       axis.line = element_line(colour="black"),
-                                      panel.grid.major = element_line(colour="#f0f0f0"),
+                                      panel.grid.major = element_blank(),
+                                      panel.grid.minor = element_blank(),
+                                      panel.border = element_blank(),
+                                      legend.key = element_rect(colour = NA),
                                       legend.position = "right",
                                       legend.direction = "vertical",
-                                      legend.key.size= unit(0.2, "cm"),
                                       legend.margin = margin(0, unit = "cm"),
                                       legend.title = element_text(face="bold"),
                                       plot.margin=unit(c(5,5,5,5),"mm"),
@@ -38,16 +43,19 @@ plot_irf <- function(x,select=NULL,...){
                                       axis.title.y = element_text(angle=90,vjust =2),
                                       axis.title.x = element_text(vjust = -0.2),
                                       axis.line = element_line(colour="black"),
-                                      panel.grid.major = element_line(colour="#f0f0f0"),
+                                      panel.grid.major = element_blank(),
+                                      panel.grid.minor = element_blank(),
+                                      panel.border = element_blank(),
                                       legend.key = element_rect(colour = NA),
                                       legend.position = "right",
                                       legend.direction = "vertical",
-                                      legend.key.size= unit(0.2, "cm"),
                                       legend.margin = margin(0, unit = "cm"),
                                       legend.title = element_text(face="bold"),
                                       plot.margin=unit(c(5,5,5,5),"mm"),
                                       strip.background=element_rect(colour="#f0f0f0",fill="#f0f0f0"),
                                       strip.text = element_text(face="bold"))
+    
+    
     return(plot1)
   }
   

@@ -1,21 +1,16 @@
-Hitem <-function(X,K=K,n=n,J=J,EO=EO,O=O){
-  cmbf <- combinations(n=K, r=3, v=J, set=FALSE, repeats.allowed=FALSE)
-  ncm <- nrow(cmbf)
+Hitem <- function(X,index=NULL,EO,O){
+  J <- colnames(X)
+  nn <- length(J)
+  cmbf <- combinations(n=nn, r=3, v=J, set=FALSE, repeats.allowed=FALSE)
   Hj <- NULL
-  for (i in 1 : K){
-    ind <- NULL;vind <- NULL
-    ind <- J[i]
-    for (g in 1:ncm){
-      if (ind %in% cmbf[g,]){
-        vind <- c(vind,g)
-      }
+  if (is.null(index)){
+    for (iter in 1:nn){
+      persi <- cmbf[which(apply(cmbf,1, function(x) J[iter] %in% x)),]
+      Hj <- c(Hj,1 - sum(O[persi]) / sum(EO[persi]))
     }
-    tind <- NULL;EOind <- NULL;Oind <- NULL;Hind <-NULL
-    tind <- cmbf[vind,]
-    Oind <- sum(O[tind])
-    EOind <- sum(EO[tind])
-    Hind <- 1 - (Oind / EOind)
-    Hj <- c(Hj,Hind)
+  }else{
+    persi <- cmbf[which(apply(cmbf,1, function(x) index %in% x)),]
+    Hj <- c(Hj,1 - sum(O[persi]) / sum(EO[persi]))
   }
   return(Hj)
 }

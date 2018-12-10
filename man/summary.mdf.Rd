@@ -2,33 +2,27 @@
 \alias{summary.mdf}
 
 \title{
-\code{summary} method for S3 class \code{mdf} objects.
+\code{summary} method for S3 class \code{"mdf"} objects.
 }
-\description{Generic function that is used in order to summarize information from \code{mdf} class objects.
+\description{Generic function that is used in order to summarize information from \code{"mdf"} class objects.
 }
 \usage{
-\method{summary}{mdf}(object,...)
+\method{summary}{mdf}(object, boot=FALSE, diagnostics=FALSE, type="perc", ...)
 }
 
 \arguments{
-   \item{object}{Object of class \code{mdf} resulted from the function \code{mudfold} or \code{as.mudfold}. }
-  \item{\dots}{Other arguments passed on to method \code{summary}. Not currently used.}
+   \item{object}{: Object of class \code{"mdf"} resulted from the function \code{mudfold} or \code{as.mudfold}.}
+   \item{boot}{: This argument applies when the \code{nboot} argument in the \code{mudfold} function is not \code{NULL}. If \code{boot=FALSE} (default) then no bootstrap information is returned by the summary. When \code{boot=TRUE}, confidence intervals, standard errors, biases, calculated from the bootstrap iterations for each parameter are given with the output. If the bootstrap estimate of the scale does not agree with the the scale of the item selection algorithm, then a summary of the bootstrap estimate of the scale is also given in the output.}
+   \item{diagnostics}{: Logical argument that controls if scale diagnostics such as the conditional adjacency matrix and the star matrix will be included in the output. If \code{diagnostics=FALSE} (default) no diagnostics are returned. If \code{diagnostics=TRUE},the conditional adjacency matrix and the star matrix are also included in the output.}
+      \item{type}{: A string that determines the type of confidence intervals that will be calculated. This argument is passed to the \code{boot.ci} function from the R package \pkg{boot}. Available options are \code{c("norm","basic", "perc", "bca")}. See \code{?boot.ci} for more information.}
+  \item{\dots}{Other arguments passed on to the function \code{boot.ci} from the R package \pkg{boot}.}
 }
 
 \details{
 A summary of the MUDFOLD scale that has been calculated with the \code{\link{mudfold}} function.
 }
 
-\value{ returns a data frame with parameters concerning the fit of each item in the scale as well as for the quality of the scale as a whole. The columns of the resulting data frame are the following.
-    \item{index}{: \code{m} selected items in the estimated MUDFOLD rank order. In the cell \code{total}, information for the total scale is given wherever this is available.}
-    \item{samp.size}{: The sample size of the data.}
-    \item{freq}{: observed frequency of positive responses.} 
-    \item{prop}{: observed proportion of positive responses.}
-    \item{std.err}{: standard error for the proportion of positive responses.}
-    \item{Obs.err}{: observed response errors.}
-    \item{Exp.err}{: expected response errors.}
-    \item{Iso}{: iso statistic.}
-    \item{Scalab.H}{: scalability coefficients.}
+\value{The output of the \code{summary.mdf()} is a list with two main components. The first component of the list is a \code{data.frame} with scale statistics and the second component is a list with item statistics. If \code{diagnostics=TRUE} another component with diagnostic matrices is also included in the output. When the bootstrap scale estimate does not agree with the obtained MUDFOLD estimate a summary of the bootstrap scale will be given in the output.
 }
 
 
@@ -52,8 +46,12 @@ W.J. Post. and T.AB. Snijders (1993). \emph{Nonparametric unfolding models for d
 \examples{
 \dontrun{
 data(ANDRICH)
-fit <- mudfold(ANDRICH)
-summary(fit)
+fit <- mudfold(ANDRICH, nboot=100)
+summary(fit, boot=TRUE, diagnostics=TRUE)
+summary(fit, boot=TRUE, diagnostics=FALSE)
+summary(fit, boot=FALSE, diagnostics=TRUE)
+summary(fit, boot=FALSE, diagnostics=FALSE)
+
 }
 }
 \keyword{methods}

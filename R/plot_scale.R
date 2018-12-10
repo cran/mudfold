@@ -1,9 +1,9 @@
 plot_scale <- function(x,select=NULL,...){
-  lscale <- x$length.scale
+  lscale <- x$MUDFOLD_INFO$second_step$Lscale
   is.select <- is.null(select)
   itm.rank <- 1:lscale
   plot.size <- 0:(lscale+1)
-  plot.labs <- x$mdfld.order
+  plot.labs <- x$MUDFOLD_INFO$second_step$scale
   if (is.select){
     df <- data.frame()
     p <- ggplot(df)+xlim(0, lscale+1)+ylim(-0.5,0.5)
@@ -11,8 +11,8 @@ plot_scale <- function(x,select=NULL,...){
     p <- p + geom_text( nudge_y = 0,aes(x=itm.rank,y=0,label=plot.labs),angle=90)
     p <- p +ggtitle("Unidimensional MUDFOLD scale")
     p <- p + theme(plot.title = element_text(hjust = 0.5),panel.grid.major = element_blank(), panel.grid.minor = element_blank(),panel.background = element_blank(), 
-              axis.line = element_blank(),axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank(),
-              axis.title.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank())
+                   axis.line = element_blank(),axis.title.x=element_blank(),axis.text.x=element_blank(),axis.ticks.x=element_blank(),
+                   axis.title.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank())
     return(p)
   }else{
     num <- is.numeric(select)
@@ -30,7 +30,6 @@ plot_scale <- function(x,select=NULL,...){
                    axis.title.y=element_blank(),axis.text.y=element_blank(),axis.ticks.y=element_blank())
     return(p)
   }
-
+  
   
 }
-?geom_line

@@ -9,7 +9,7 @@ European party activists preferences for two political parties in the European p
 }
 \usage{data("EURPAR2")}
 \format{
-  A data frame with 1786 observations (responses) on the following 6 variables (items).
+  A data frame with 1786 observations (responses) on the following 6 binary valued items.
   \describe{
     \item{\code{communists}}{Communistic political party;}
     \item{\code{socdemocr}}{Social Democratic political party;}

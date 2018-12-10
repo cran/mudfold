@@ -1,20 +1,20 @@
 Package: mudfold
 Type: Package
 Title: Multiple UniDimensional unFOLDing
-Version: 1.1.0
-Date: 2017-12-11
-Authors@R: c(person("Spyros", "Balafas", email = "s.balafas@rug.nl", role = c("aut", "cre")),person("Wim", "Krijnen", role = "aut"),person("Wendy", "Post", role = "ctr"),person("Ernst", "Wit", role = "aut"))
-Description: Nonparametric item response theory (IRT) model for nonmonotonic IRFs, which is fruitful for scale analysis of proximity items.
-Depends: R (>= 3.3.3), yesno, gtools, zoo, ggplot2, reshape2, stats,
-        utils
+Version: 1.1.1
+Date: 2018-12-7
+Authors@R: c(person("Spyros", "Balafas", email = "s.balafas@rug.nl", role = c("aut", "cre")),person("Wim", "Krijnen", role = "aut"),person("Wendy", "Post", role = "ctb"),person("Ernst", "Wit", role = "aut"))
+Description: Nonparametric unfolding item response theory (IRT) model for dichotomous data (see W.H. Van Schuur (1984). Structure in Political Beliefs: A New Model for Stochastic Unfolding with Application to European Party Activists, and W.J.Post (1992). Nonparametric Unfolding Models: A Latent Structure Approach). The package implements MUDFOLD (Multiple UniDimensional unFOLDing), an iterative item selection algorithm that constructs unfolding scales from dichotomous preferential-choice data without explicitly assuming a parametric form of the item response functions. Scale diagnostics from Post(1992) and estimates for the person locations proposed by Johnson(2006) and Van Schuur(1984) are also available. This model can be seen as the unfolding variant of Mokken(1971) scaling method.
+Depends: R (>= 3.3.3)
+Imports: gtools, boot, zoo, ggplot2, reshape2, stats, utils
 License: GPL (>= 2)
-URL: http://www.math.rug.nl/stat/Main/HomePage
-Packaged: 2017-12-18 12:59:49 UTC; balaf
+URL: https://github.com/cran/mudfold
+Packaged: 2018-12-09 23:47:22 UTC; balaf
 Maintainer: Spyros Balafas <s.balafas@rug.nl>
 Repository: CRAN
 NeedsCompilation: no
 Author: Spyros Balafas [aut, cre],
   Wim Krijnen [aut],
-  Wendy Post [ctr],
+  Wendy Post [ctb],
   Ernst Wit [aut]
-Date/Publication: 2017-12-18 14:04:10 UTC
+Date/Publication: 2018-12-10 08:50:03 UTC

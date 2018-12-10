@@ -1,18 +1,17 @@
 \name{print.mdf}
 \alias{print.mdf}
-\title{\code{print} method for \code{mdf} class objects.
+\title{\code{print} method for \code{"mdf"} class objects resulted from the \code{mudfold} function.
 }
-\description{S3 generic function for printing \code{mdf} class objects.
+\description{S3 generic function for printing \code{"mdf"} class objects.
 }
 
 \usage{
-\method{print}{mdf}(x, Item.info= FALSE, Diagnostics= FALSE,...)
+\method{print}{mdf}(x, ...)
 }
 
 \arguments{
-   \item{x}{Object of class \code{mdf}}
-   \item{Item.info}{logical argument. If \code{Item.info=TRUE} then additional information for each item in the scale is printed.}
-   \item{Diagnostics}{logical argument. If \code{Diagnostics= TRUE} then the diagnostic matrices for the item order are printed.}
+   \item{x}{Object of class \code{"mdf"}}
+
    \item{...}{further arguments passed on to the \code{print} method.}
 }
 
@@ -39,7 +38,7 @@ W.J. Post. and T.AB. Snijders (1993). \emph{Nonparametric unfolding models for d
 data(ANDRICH)
 fit <- mudfold(ANDRICH)
 fit
-print(fit,Item.info= TRUE, Diagnostics= TRUE)
+print(fit)
 }
 }
 \keyword{methods}

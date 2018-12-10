@@ -1,21 +1,21 @@
 \name{plot.mdf}
 \alias{plot.mdf}
-\title{\code{plot} function for \code{mdf} class objects.
+\title{\code{plot} function for \code{"mdf"} class objects.
 }
-\description{Generic function for plotting S3 class \code{mdf} objects. This function, is plotting the rows of the conditional adjacency matrix (CAM) which are nonparametric estimates of the item response functions. The plot is produced using the \code{ggplot} function from the package \pkg{ggplot2}.
+\description{Generic function for plotting S3 class \code{"mdf"} objects. This function, is plotting the rows of the conditional adjacency matrix (CAM) which are nonparametric estimates of the item response functions. The plot is produced using the \code{ggplot} function from the package \pkg{ggplot2}.
 }
 \usage{
-\method{plot}{mdf}(x,select=NULL,plot.type="IRF",...)
+\method{plot}{mdf}(x, select=NULL, plot.type="IRF", ...)
 }
 \arguments{
     \item{x}{Object of class \code{mdf}}
-    \item{select}{: in this argument we can provide a subset of items that we wish them to be explicitly plotted. If \code{select=NULL} the estimated IRF for each item in the scale is plotted.}
-    \item{plot.type}{: Determines the type of plot that is returned. By default, \code{plot.type="IRF"}, which returns the estimated IRFs for the MUDFOLD item order. The user can set \code{plot.type="scale"} in order to get plotted the unidimensional MUDFOLD scale.}
+    \item{select}{: in this argument the user can provide a subset of items he would like them to be explicitly plotted. If \code{select=NULL} the estimated IRF for every item in the scale is plotted. When \code{plot.type="persons"} this argument is ignored.}
+    \item{plot.type}{: Determines the type of plot that is returned. By default, \code{plot.type="IRF"}, which returns the estimated IRFs for the items in the MUDFOLD scale. The user can set \code{plot.type="scale"} in order to get plotted the unidimensional MUDFOLD scale. Setting \code{plot.type="persons"} will return the distribution of the person parameters on the latent scale.}
     \item{\dots}{Other arguments passed on to \code{ggplot} plotting method.}
 }
 
 \details{
-The \code{plot} method is used to obtain a graphical representation of the estimated item response functions. As estimates of the IRFs are considered the rows of the CAM. For interpolating the missing diagonal elements of the CAM, we make use of the \code{na.approx} function from the package \pkg{zoo}.
+The \code{plot} method is used to obtain a graphical representation of the estimated rank order of the items, the item response functions, and the distribution of the person parameters. As estimates of the IRFs are considered the rows of the CAM. For interpolating the missing diagonal elements of the CAM, we make use of the \code{na.approx} function from the package \pkg{zoo}.
 }
 
 \author{Spyros E. Balafas (auth.), Wim P. Krijnen (auth.), Wendy J. Post (contr.), Ernst C. Wit (auth.)
@@ -51,8 +51,10 @@ http://www.jstatsoft.org/v21/i12/.
 \dontrun{
 data(ANDRICH)
 fit <- mudfold(ANDRICH)
-plot(fit)
-plot(fit,select="DONTBELIEV")
+plot(fit, plot.type= "scale")
+plot(fit, plot.type= "IRF")
+plot(fit, plot.type= "persons")
+plot(fit, select="DONTBELIEV", plot.type= "IRF")
 }
 }
 \keyword{methods}
