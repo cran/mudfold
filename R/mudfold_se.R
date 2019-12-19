@@ -1,6 +1,6 @@
 mudfold_se <- function(out){
   out_list <- out
-  data <- out_list$CALL$data
+  data <- na.omit(out_list$CALL$data)
   lambda1 <- out_list$CALL$lambda1
   lambda2 <- out_list$CALL$lambda2
   hcoeft <- out_list$MUDFOLD_INFO$triple_stats$H_coefficients
@@ -87,16 +87,18 @@ mudfold_se <- function(out){
   list_res$MUDFOLD_INFO$second_step$scale <- b_unq
   list_res$MUDFOLD_INFO$second_step$excluded_items <- reit
   list_res$MUDFOLD_INFO$second_step$Lscale <- length(b_unq)
-  list_res$MUDFOLD_INFO$second_step$COND_ADJ <- CADJ(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$CAM <- CAM(data[,b_unq])
   list_res$MUDFOLD_INFO$second_step$CORR <- cor(data[,b_unq])
   list_res$MUDFOLD_INFO$second_step$ADJ <- ADJ(data[,b_unq]) 
   list_res$MUDFOLD_INFO$second_step$DOM <- DOM(data[,b_unq])
-  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$CAM)
   list_res$MUDFOLD_INFO$second_step$Hscale <- Hscale(data[,b_unq],EO=experr,O=obserr)
   list_res$MUDFOLD_INFO$second_step$Hitem <- Hitem(data[,b_unq],EO=experr,O=obserr)
   #list_res$MUDFOLD_INFO$second_step$H_minus_item <- Hscalej(data[,b_unq],EO=experr,O=obserr)
-  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$CAM)
   list_res$MUDFOLD_INFO$second_step$ISOscale <- sum(list_res$MUDFOLD_INFO$second_step$ISOitem)
+  list_res$MUDFOLD_INFO$second_step$MAXitem <- MAX(list_res$MUDFOLD_INFO$second_step$CAM)
+  list_res$MUDFOLD_INFO$second_step$MAXscale <- sum(list_res$MUDFOLD_INFO$second_step$MAXitem) / (list_res$MUDFOLD_INFO$second_step$Lscale^2 / 12)
   list_res$MUDFOLD_INFO$second_step$OBSitem <- Err_obs_item(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$OBSscale<- Err_obs_scale(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$EXPitem <- Err_exp_item(data[,b_unq],EO=experr)

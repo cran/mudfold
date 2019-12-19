@@ -1,5 +1,7 @@
 pick <- function(data, k=NULL, cutoff=NULL, byItem=FALSE){
   x <- data
+  xnames <- dimnames(data)[[2]]
+  if (is.null(xnames)) xnames <- paste("Item",1:ncol(data))
   if (is.null(byItem)) byItem <- FALSE
   isfactor <- sapply(x,is.factor)
   if(any(isfactor)){
@@ -49,14 +51,17 @@ pick <- function(data, k=NULL, cutoff=NULL, byItem=FALSE){
     if(ll2){
       if (byItem){
         x <- sapply(1:K, function(col) ifelse(x[,col] < cutoff[col],0,1))
+        dimnames(x)[[2]] <- xnames
       }else{
         x <- sapply(1:K, function(col) ifelse(x[col,] < cutoff[col],0,1))
         x <- t(x)
+        dimnames(x)[[2]] <- xnames
       }
       
     }
     if(ll3==0) stop("length(cutoff) must be equal to 1 or to the number of rows/columns of x")
   }
+  if (any(apply(x,2,function(x) length(unique(x))==1))) warning("there exist items with no variance after applying pick()")
   return(data.frame(x))
 } 
   

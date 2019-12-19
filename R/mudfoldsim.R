@@ -58,7 +58,7 @@ mudfoldsim <- function(N, n, gamma1=5, gamma2=-10, zeros=FALSE, parameters="norm
     X<-Kmat[or,rnk]
     Prob <- Prob[or,]
     dim2 <- NA
-    if (N<= 26) dim2 <- LETTERS[rnk] else dim2 <- as.character(rnk)
+    if (N<= 26) dim2 <- LETTERS[rnk] else dim2 <- paste("Item",as.character(rnk), sep = "")
     dimnames(X)[[2]] <- dim2
     dimnames(Prob)[[2]] <- dim2
     names(rnk) <- dim2

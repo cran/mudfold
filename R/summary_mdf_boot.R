@@ -1,5 +1,4 @@
-summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
-  if(is.null(diagnostics)) diagnostics <- FALSE
+summary_mdf_boot <- function(object, type, ...){
   if(is.null(type)) type <- "perc"
   
   summaryobject <- list()
@@ -31,18 +30,22 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   
   Hj <- round(object$MUDFOLD_INFO$second_step$Hitem,2)
   Htot <- round(object$MUDFOLD_INFO$second_step$Hscale,2)
-  Iso.stat <- round(object$MUDFOLD_INFO$second_step$ISOitem,2)
+  Iso.stat <- round(object$MUDFOLD_INFO$second_step$ISOitem,3)
+  Max.stat <- object$MUDFOLD_INFO$second_step$MAXitem
+  
   Iso.stat.tot <- round(object$MUDFOLD_INFO$second_step$ISOscale,2)
-  scale_in <- 1:4
-  itemH_in <- 5:(4+ncol(dat))
+  Max.stat.tot <- round(object$MUDFOLD_INFO$second_step$MAXscale,2)
+  
+  scale_in <- 1:5
+  itemH_in <- 6:(5+ncol(dat))
   itemIs_in <- itemH_in + ncol(dat)
-  itemEO_in <- itemIs_in + ncol(dat)
+  itemMx_in <- itemIs_in + ncol(dat)
+  itemEO_in <- itemMx_in + ncol(dat)
   itemO_in <- itemEO_in + ncol(dat)
-  tot_cols <- 4+(4*ncol(object$CALL$data))
-  iter_used <- object$CALL$nboot - sapply(1:tot_cols,function(x) sum(is.na(object$BOOTSTRAP$BOOT$t[,x])))
+  tot_cols <- 5+(5*ncol(object$CALL$data))
+  iter_used <- object$CALL$nboot - unlist(lapply(1:tot_cols,function(x) sum(is.na(object$BOOTSTRAP$BOOT$t[,x]))))
   object$BOOTSTRAP$BOOT$t <- apply(object$BOOTSTRAP$BOOT$t,2,function(x){
     vi <- x;v <- na.omit(x);lv <- length(v);vv <- unique(v);lvv <- length(vv)
-    
     if (lvv==1){
       val <- ifelse(vv==1,0.99,0.01)
       ind <- sample(1:lv,max(1,round(lv/30)));v[ind] <- val
@@ -65,6 +68,7 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   BOOT_BIAS_STD_SCALE <- BOOT_BIAS_STD[scale_in,]
   BOOT_BIAS_STD_ITEMH <- BOOT_BIAS_STD[itemH_in,][match(item.index,sn),]
   BOOT_BIAS_STD_ITEMIS <- BOOT_BIAS_STD[itemIs_in,][match(item.index,sn),]
+  BOOT_BIAS_STD_ITEMAX <- BOOT_BIAS_STD[itemMx_in,][match(item.index,sn),]
   BOOT_BIAS_STD_ITEMEO <- BOOT_BIAS_STD[itemEO_in,][match(item.index,sn),]
   BOOT_BIAS_STD_ITEMO <- BOOT_BIAS_STD[itemO_in,][match(item.index,sn),]
   
@@ -76,6 +80,8 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   BOOTCI_ITEM_H[sapply(BOOTCI_ITEM_H,is.null)] <- NA
   BOOTCI_ITEM_ISO <- BOOTCI[itemIs_in]
   BOOTCI_ITEM_ISO[sapply(BOOTCI_ITEM_ISO,is.null)] <- NA
+  BOOTCI_ITEM_MAX <- BOOTCI[itemMx_in]
+  BOOTCI_ITEM_MAX[sapply(BOOTCI_ITEM_MAX,is.null)] <- NA
   BOOTCI_ITEM_EO <- BOOTCI[itemEO_in]
   BOOTCI_ITEM_EO[sapply(BOOTCI_ITEM_EO,is.null)] <- NA
   BOOTCI_ITEM_O <- BOOTCI[itemO_in]
@@ -87,10 +93,11 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   summaryobject$SCALE_STATS <- NULL
   sumScaleH <- cbind(c(object$MUDFOLD_INFO$second_step$Hscale,
                        object$MUDFOLD_INFO$second_step$ISOscale,
+                       object$MUDFOLD_INFO$second_step$MAXscale,
                        object$MUDFOLD_INFO$second_step$EXPscale,
                        object$MUDFOLD_INFO$second_step$OBSscale),
                      t(sapply(BOOTCI_SCALE,function(x){
-                       if (any(is.na(x))) return(c(NA,NA)) else{
+                       if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
                          if (type=="norm") return(round(x$normal[,2:3],3))
                          if (type=="basic") return(round(x$basic[,4:5],3))
                          if (type=="perc") return(round(x$percent[,4:5],3))
@@ -98,13 +105,13 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
                        } 
                      })))
   sumScaleH <- round(matrix(sumScaleH,ncol = 3),3)
-  dimnames(sumScaleH) <- list(c("H(scale)","ISO(scale)","EO(scale)","O(scale)"),c("value",paste(type,"_lower95CI",sep = ""),paste(type,"_upper95CI",sep = "")))
+  dimnames(sumScaleH) <- list(c("H(scale)","ISO(scale)","MAX(scale)","EO(scale)","O(scale)"),c("value",paste(type,"_lower95CI",sep = ""),paste(type,"_upper95CI",sep = "")))
   summaryobject$SCALE_STATS <- round(cbind(sumScaleH,BOOT_BIAS_STD_SCALE),3)
   
   
   summaryobject$ITEM_STATS <- list()
   HCISTART <- t(sapply(BOOTCI_ITEM_H[match(item.index,sn)],function(x,type){
-    if (any(is.na(x))) return(c(NA,NA)) else{
+    if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))
       if (type=="perc") return(round(x$percent[,4:5],3))
@@ -119,7 +126,7 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   
   
   ISOCISTART <- lapply(BOOTCI_ITEM_ISO[match(item.index,sn)],function(x){
-    if (any(is.na(x))) return(c(NA,NA)) else{
+    if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))
       if (type=="perc") return(round(x$percent[,4:5],3))
@@ -131,10 +138,21 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   summaryobject$ITEM_STATS$ISO_MUDFOLD_items <- cbind(sumISOit,BOOT_BIAS_STD_ITEMIS)
   dimnames(summaryobject$ITEM_STATS$ISO_MUDFOLD_items)[[1]] <- dimnames(BOOT_BIAS_STD_ITEMIS)[[1]]
   
-  
+  MAXCISTART <- lapply(BOOTCI_ITEM_MAX[match(item.index,sn)],function(x){
+    if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
+      if (type=="norm") return(round(x$normal[,2:3],3))
+      if (type=="basic") return(round(x$basic[,4:5],3))
+      if (type=="perc") return(round(x$percent[,4:5],3))
+      if (type=="bca") return(round(x$percent[,4:5],3))
+    }
+  })
+  sumMAXit <- data.frame(cbind(Max.stat, round(do.call(rbind,MAXCISTART),3)))
+  dimnames(sumMAXit)[[2]] <- c("value",paste(type,"_lower95CI",sep=""),paste(type,"_upper95CI",sep = ""))
+  summaryobject$ITEM_STATS$MAX_MUDFOLD_items <- cbind(sumMAXit,BOOT_BIAS_STD_ITEMAX)
+  dimnames(summaryobject$ITEM_STATS$MAX_MUDFOLD_items)[[1]] <- dimnames(BOOT_BIAS_STD_ITEMAX)[[1]]
   
   EOCISTART <- lapply(BOOTCI_ITEM_EO[match(item.index,sn)],function(x){
-    if (any(is.na(x))) return(c(NA,NA)) else{
+    if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))
       if (type=="perc") return(round(x$percent[,4:5],3))
@@ -147,7 +165,7 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   dimnames(summaryobject$ITEM_STATS$EO_MUDFOLD_items)[[1]] <- dimnames(BOOT_BIAS_STD_ITEMEO)[[1]]
   
   OCISTART <- lapply(BOOTCI_ITEM_O[match(item.index,sn)],function(x){
-    if (any(is.na(x))) return(c(NA,NA)) else{
+    if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))
       if (type=="perc") return(round(x$percent[,4:5],3))
@@ -159,13 +177,14 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   summaryobject$ITEM_STATS$O_MUDFOLD_items <- cbind(sumOit,BOOT_BIAS_STD_ITEMO)
   dimnames(summaryobject$ITEM_STATS$O_MUDFOLD_items)[[1]] <- dimnames(BOOT_BIAS_STD_ITEMO)[[1]]
   
-  if (!scales_equal){
-    summaryobject$BOOT_SCALE <- NULL
-    BOOT_MDF <- as.mudfold(object$CALL$data_s[,boot.index],estimation = object$CALL$estimation)
-    sUM_BOOT_MDF <- summary_mdf(BOOT_MDF,diagnostics = FALSE)
-    summaryobject$BOOT_SCALE <- sUM_BOOT_MDF
+  if (!(object$CALL$Bootstrap & object$CALL$missings == "impute")){
+    if (!scales_equal){
+      summaryobject$BOOT_SCALE <- NULL
+      BOOT_MDF <- as.mudfold(object$CALL$data_s[,boot.index],estimation = object$CALL$estimation)
+      sUM_BOOT_MDF <- summary_mdf(BOOT_MDF,diagnostics = FALSE)
+      summaryobject$BOOT_SCALE <- sUM_BOOT_MDF
+    }
   }
-  
   
   summ <- matrix(NA, nrow=K, ncol=5)
   dimnames(summ)[[2]] <-c("items", "n_persons", 
@@ -178,13 +197,5 @@ summary_mdf_boot <- function(object, diagnostics=FALSE, type, ...){
   summ[,4] <- pj
   summ[,5] <- stdd
   summaryobject$ITEM_STATS$ITEM_DESCRIPTIVES <-summ
-  
-  
-  
-  if (diagnostics==TRUE){
-    summaryobject$DIAGNOSTICS <- list()
-    summaryobject$DIAGNOSTICS$COND_ADJACENCY <- round(object$MUDFOLD_INFO$second_step$COND_ADJ,3)
-    summaryobject$DIAGNOSTICS$STAR <- object$MUDFOLD_INFO$second_step$STAR
-  }
   return(summaryobject)
 }

@@ -1,4 +1,4 @@
-summary_mdf <- function(object,diagnostics,...){
+summary_mdf <- function(object,...){
   summaryobject <- list()
   dat <- object$CALL$data
   item.index <- object$MUDFOLD_INFO$second_step$scale
@@ -21,22 +21,25 @@ summary_mdf <- function(object,diagnostics,...){
   Htot <- round(object$MUDFOLD_INFO$second_step$Hscale,2)
   Iso.stat <- round(object$MUDFOLD_INFO$second_step$ISOitem,2)
   Iso.stat.tot <- round(object$MUDFOLD_INFO$second_step$ISOscale,2)
+  Max.stat <- round(object$MUDFOLD_INFO$second_step$MAXitem,2)
+  Max.stat.tot <- round(object$MUDFOLD_INFO$second_step$MAXscale,2)
   
-  summs <- matrix(NA, nrow=4, ncol=1)
-  dimnames(summs)[[1]] <-c("H(scale)","ISO(scale)","O(scale)", "EO(scale)")
+  summs <- matrix(NA, nrow=5, ncol=1)
+  dimnames(summs)[[1]] <-c("H(scale)","ISO(scale)","MAX(scale)", "O(scale)", "EO(scale)")
   dimnames(summs)[[2]] <- "value"
   summs <- as.data.frame(summs)
   summs[1,] <- Htot
   summs[2,] <- Iso.stat.tot
-  summs[3,] <- Obs.errors.tot
-  summs[4,] <- Exp.errors.tot
+  summs[3,] <- Max.stat.tot
+  summs[4,] <- Obs.errors.tot
+  summs[5,] <- Exp.errors.tot
   summaryobject$SCALE_STATS <- summs
   
   
-  summ <- matrix(NA, nrow=K, ncol=9)
+  summ <- matrix(NA, nrow=K, ncol=10)
   dimnames(summ)[[2]] <-c("items", "n_persons", 
                           "posit(items)", "pposit(items)", "se(items)",
-                          "O(items)", "EO(items)","ISO(items)","H(items)" )
+                          "O(items)", "EO(items)","MAX(items)", "ISO(items)","H(items)" )
   
   summ <- as.data.frame(summ)
   summ[,1] <- item.index
@@ -46,15 +49,11 @@ summary_mdf <- function(object,diagnostics,...){
   summ[,5] <- stdd
   summ[,6] <- Obs.errors
   summ[,7] <- Exp.errors
-  summ[,8] <- Iso.stat
-  summ[,9] <- Hj
+  summ[,8] <- Max.stat
+  summ[,9] <- Iso.stat
+  summ[,10] <- Hj
   summaryobject$ITEM_STATS <- summ
-  
-  if (diagnostics==TRUE){
-    summaryobject$DIAGNOSTICS <- list()
-    summaryobject$DIAGNOSTICS$COND_ADJACENCY <- round(object$MUDFOLD_INFO$second_step$COND_ADJ,3)
-    summaryobject$DIAGNOSTICS$STAR <- object$MUDFOLD_INFO$second_step$STAR
-  }
+
   return(summaryobject)
   
 }

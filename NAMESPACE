@@ -2,14 +2,18 @@
 S3method( "summary", "mdf" )
 S3method( "plot",    "mdf" )
 S3method( "print",   "mdf" )
-export("mudfold", "mudfoldsim", "as.mudfold", "pick")
+S3method( "coef",   "mdf" )
+export("mudfold", "mudfoldsim", "as.mudfold", "pick", "CAM", "ISO", "MAX", "diagnostics")
 import("ggplot2")
 import("boot")
-importFrom("gtools", "combinations")
+import("glmnet")
+import("mgcv")
 importFrom("zoo", "na.approx")
 importFrom("reshape2", "melt")
-importFrom("stats", "cor", "na.omit", "rbinom", "rnorm", "runif","var","density")
-
-
-
-
+importFrom("utils", "packageVersion")
+importFrom("stats", "cor", "na.omit", "rbinom", "rnorm", "runif","var","density","as.formula", "coef", "complete.cases", "formula","model.frame", "model.matrix", "na.pass", "reformulate", "summary.glm", "terms", "update")
+importFrom("grDevices", "dev.capabilities")
+importFrom("broom","tidy")
+importFrom("dplyr","bind_rows", "bind_cols")
+importFrom("graphics", "axis", "image", "title")
+importFrom("stats", "binomial", "predict")

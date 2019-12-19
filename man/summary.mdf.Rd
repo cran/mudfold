@@ -7,14 +7,13 @@
 \description{Generic function that is used in order to summarize information from \code{"mdf"} class objects.
 }
 \usage{
-\method{summary}{mdf}(object, boot=FALSE, diagnostics=FALSE, type="perc", ...)
+\method{summary}{mdf}(object, boot=FALSE, type="perc", ...)
 }
 
 \arguments{
    \item{object}{: Object of class \code{"mdf"} resulted from the function \code{mudfold} or \code{as.mudfold}.}
    \item{boot}{: This argument applies when the \code{nboot} argument in the \code{mudfold} function is not \code{NULL}. If \code{boot=FALSE} (default) then no bootstrap information is returned by the summary. When \code{boot=TRUE}, confidence intervals, standard errors, biases, calculated from the bootstrap iterations for each parameter are given with the output. If the bootstrap estimate of the scale does not agree with the the scale of the item selection algorithm, then a summary of the bootstrap estimate of the scale is also given in the output.}
-   \item{diagnostics}{: Logical argument that controls if scale diagnostics such as the conditional adjacency matrix and the star matrix will be included in the output. If \code{diagnostics=FALSE} (default) no diagnostics are returned. If \code{diagnostics=TRUE},the conditional adjacency matrix and the star matrix are also included in the output.}
-      \item{type}{: A string that determines the type of confidence intervals that will be calculated. This argument is passed to the \code{boot.ci} function from the R package \pkg{boot}. Available options are \code{c("norm","basic", "perc", "bca")}. See \code{?boot.ci} for more information.}
+\item{type}{: A string that determines the type of confidence intervals that will be calculated. This argument is passed to the \code{boot.ci} function from the R package \pkg{boot}. Available options are \code{c("norm","basic", "perc", "bca")}. See \code{?boot.ci} for more information.}
   \item{\dots}{Other arguments passed on to the function \code{boot.ci} from the R package \pkg{boot}.}
 }
 
@@ -47,10 +46,8 @@ W.J. Post. and T.AB. Snijders (1993). \emph{Nonparametric unfolding models for d
 \dontrun{
 data(ANDRICH)
 fit <- mudfold(ANDRICH, nboot=100)
-summary(fit, boot=TRUE, diagnostics=TRUE)
-summary(fit, boot=TRUE, diagnostics=FALSE)
-summary(fit, boot=FALSE, diagnostics=TRUE)
-summary(fit, boot=FALSE, diagnostics=FALSE)
+summary(fit, boot=TRUE)
+summary(fit, boot=FALSE)
 
 }
 }

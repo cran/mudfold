@@ -22,6 +22,7 @@ boot_bias_std <- function(x){
     dimnames(op) <- list(rn, c("mean", "std. error"))
   }else {
     t0 <- boot.out$t0[index]
+    t0[is.na(t0)] <- 0
     if (is.null(boot.out$call$weights)) {
       op <- cbind( apply(t, 2L, mean, na.rm = TRUE) - 
                      t0, sqrt(apply(t, 2L, function(t.st) var(t.st[!is.na(t.st)]))))

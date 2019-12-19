@@ -8,16 +8,37 @@ print.mdf <- function(x, ...){
   if (!is.null(x$CHECK$SAMPLE$missing_values$ndel_rows)){
     cat("\nMissing values:","TRUE" )
     cat("\nNumber of cases with missings:",x$CHECK$SAMPLE$missing_values$ndel_rows)
-    cat("\nTotal number of missings:",sum(x$CHECK$SAMPLE$missing_values$missing_rows),"\n")
+    cat("\nTotal number of missings:",sum(x$CHECK$SAMPLE$missing_values$missing_rows))
+    cat("\nMissings per item:",x$CHECK$SAMPLE$missing_values$missing_cols)
+    mat_miss <- matrix(NA, ncol = length(x$CHECK$SAMPLE$missing_values$deleted_rows),nrow = 1,dimnames = list("nmiss",x$CHECK$SAMPLE$missing_values$deleted_rows) )
+    mat_miss[1,] <- x$CHECK$SAMPLE$missing_values$missing_rows[x$CHECK$SAMPLE$missing_values$deleted_rows]
+    cat("\nPersons with missings:")
+    print(mat_miss)
+    if (x$CALL$missings=="impute"){
+      if (!x$CALL$Bootstrap){
+        cat("\nMultiple imputation (mice):","YES")
+        cat("\nTotal number of mice imputations:",x$CALL$nmice,"\n")
+      }else{
+        cat("\nMultiple imputation (mice):","YES")
+        cat("\nTotal number of mice imputations:",x$CALL$nboot,"\n")
+      }
+    }
   } 
   if (!is.null(x$CHECK$zero_responses$n_zero_persons)){
-    cat("\nZero responses:","TRUE")
-    cat("\nNumber of persons with zero responses:",x$CHECK$zero_responses$n_zero_persons)
-    cat("\nNumber of items with zero responses:",x$CHECK$zero_responses$n_zero_items,"\n")
+    if (is.null(x$CHECK$SAMPLE$missing_values$ndel_rows)){
+      cat("\nZero responses:","TRUE")
+      cat("\nNumber of persons with zero responses:",x$CHECK$zero_responses$n_zero_persons)
+      cat("\nNumber of items with zero responses:",x$CHECK$zero_responses$n_zero_items,"\n")
+    }else{
+      cat("\nZero responses (when missings are ignored):","TRUE")
+      cat("\nNumber of persons with zero responses:",x$CHECK$zero_responses$n_zero_persons)
+      cat("\nNumber of items with zero responses:",x$CHECK$zero_responses$n_zero_items,"\n")
+    }
+  
   } 
+
   cat("\nIndividuals:", x$DESCRIPTIVES$n_persons_final)
   cat("\nItems:", x$DESCRIPTIVES$n_items_final,"\n")
-  
   cat("\nEstimation method:",x$CALL$estimation)
   if (!is.null(x$CALL$start)) cat("\nStarting scale:",x$CALL$start)
   cat("\nLambda1:",x$CALL$lambda1)
@@ -48,8 +69,13 @@ print.mdf <- function(x, ...){
     if (x$CALL$Bootstrap){
       cat("\nBootstrap 95% percentile CI for the ISO statistic:",
           paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 2)$percent[,4:5],3),collapse = ", "),")",sep = ""),"\n")
+    }
+    cat("\nMax statistic for the MUDFOLD scale:",x$MUDFOLD_INFO$second_step$MAXscale)
+    if (x$CALL$Bootstrap){
+      cat("\nBootstrap 95% percentile CI for the MAX statistic:",
+          paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 3)$percent[,4:5],3),collapse = ", "),")",sep = ""),"\n")
       cat("\nSummary of bootstrap iterations:\n")
-      print(summary(x$BOOTSTRAP$BOOT$t)[,1:2])
+      print(summary(x$BOOTSTRAP$BOOT$t)[,1:3])
     }
     
     cat("\n")

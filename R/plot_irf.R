@@ -2,9 +2,9 @@ plot_irf <- function(x,select=NULL,...){
   output <- character(0L)
   output <- x$MUDFOLD_INFO$second_step$scale
   nc <- x$MUDFOLD_INFO$second_step$Lscale
-  tcad <- t(x$MUDFOLD_INFO$second_step$COND_ADJ)
+  tcad <- na.approx(t(x$MUDFOLD_INFO$second_step$CAM), rule=2)
   value <- variable <-Items <- index <- NULL
-  A <- cbind(as.matrix(na.approx(tcad)),1:nc)
+  A <- cbind(as.matrix(tcad),1:nc)
   dimnames(A) <- list(1:nc, c(output,"index"))
   A <- as.data.frame(A)
   d <- melt(A, id.vars="index")

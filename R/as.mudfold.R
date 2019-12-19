@@ -7,6 +7,8 @@ as.mudfold <- function(data,estimation="rank"){
   out_list$CALL$match.call <- call
   out_list$CALL$estimation <- estimation
   out_list$CALL$method <- "as.mudfold()"
+  out_list$CALL$missings <- "omit"
+  
   
   ################################# CHECK THE DATA ###################################
   ####################################################################################
@@ -17,8 +19,8 @@ as.mudfold <- function(data,estimation="rank"){
   out_list$CALL$lambda1 <- "-"
   out_list$CALL$lambda2 <- "-"
   
-  out_list$MUDFOLD_INFO$first_step$Converged <- "SKIPPED"
-  out_list$MUDFOLD_INFO$second_step$Converged <- "SKIPPED"
+  out_list$MUDFOLD_INFO$first_step$Converged <- FALSE
+  out_list$MUDFOLD_INFO$second_step$Converged <- FALSE
   
   ########################## CALCULATE MUDFOLD STATISTICS ############################
   ####################################################################################
@@ -32,16 +34,19 @@ as.mudfold <- function(data,estimation="rank"){
   list_res <- out_list
   list_res$MUDFOLD_INFO$second_step$scale <- b_unq
   list_res$MUDFOLD_INFO$second_step$Lscale <- length(b_unq)
-  list_res$MUDFOLD_INFO$second_step$COND_ADJ <- CADJ(data[,b_unq])
+  list_res$MUDFOLD_INFO$second_step$CAM <- CAM(data[,b_unq])
   list_res$MUDFOLD_INFO$second_step$CORR <- cor(data[,b_unq])
   list_res$MUDFOLD_INFO$second_step$ADJ <- ADJ(data[,b_unq]) 
   list_res$MUDFOLD_INFO$second_step$DOM <- DOM(data[,b_unq])
-  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$STAR <- CAM_STAR(list_res$MUDFOLD_INFO$second_step$CAM)
   list_res$MUDFOLD_INFO$second_step$Hscale <- Hscale(data[,b_unq],EO=experr,O=obserr)
   list_res$MUDFOLD_INFO$second_step$Hitem <- Hitem(data[,b_unq],EO=experr,O=obserr)
   #list_res$MUDFOLD_INFO$second_step$H_minus_item <- Hscalej(data[,b_unq],EO=experr,O=obserr)
-  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$COND_ADJ)
+  list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$CAM)
+  list_res$MUDFOLD_INFO$second_step$MAXitem <- MAX(list_res$MUDFOLD_INFO$second_step$CAM)
   list_res$MUDFOLD_INFO$second_step$ISOscale <- sum(list_res$MUDFOLD_INFO$second_step$ISOitem)
+  list_res$MUDFOLD_INFO$second_step$MAXscale <- sum(list_res$MUDFOLD_INFO$second_step$MAXitem)
+
   list_res$MUDFOLD_INFO$second_step$OBSitem <- Err_obs_item(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$OBSscale<- Err_obs_scale(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$EXPitem <- Err_exp_item(data[,b_unq],EO=experr)

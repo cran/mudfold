@@ -9,7 +9,8 @@ This function is used to fit a unidimensional unfolding scale to the responses o
 Diagnostic statistics that are used to test the model assumptions are borrowed from the nonparametric unfolding model of Post(1992). Uncertainty estimates for the scalability coefficients and the diagnostic statistics both for the scale and the individual items are obtained using nonparametric ordinary bootstrap. A bootstrap estimate of the scale is obtained as the most frequently observed scale in \eqn{R} bootstrap iterations.
 }
 \usage{
-mudfold(data, estimation="rank", lambda1=0.3, lambda2=0, start=NULL, nboot=NULL, ...)
+mudfold( data, estimation, lambda1, lambda2, start.scale, 
+nboot, missings, nmice, seed, mincor, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,12 +23,22 @@ to \code{ncol(data)} items. Missing values in \code{data} are not allowed.
 }
 \item{lambda2}{: User specified numerical value that controls explicitly the first scalability criterion of the scale expansion. In the default settings \eqn{\lambda_2=0}, however, the user can choose a negative value for \eqn{\lambda_2}, which leads to less strict scalability criterion in the beginning of the scale expansion.
 }
-\item{start}{: An ordered character vector with item names from \code{colnames(data)}. The length of this vector should be greater than or equal to \eqn{3} and less than or equal to \code{ncol(data)}. This ordered item set is used as a startset for the scale extension phase of MUDFOLD method. If \code{start=NULL} the standard MUDFOLD method is fitted to the data.
+\item{start.scale}{: An ordered character vector with item names from \code{colnames(data)}. The length of this vector should be greater than or equal to \eqn{3} and less than or equal to \code{ncol(data)}. This ordered item set is used as a startset for the scale extension phase of MUDFOLD method. If \code{start.scale=NULL} the standard MUDFOLD method is fitted to the data.
 }
 
 \item{nboot}{: Argument that controls the number of bootstrap iterations. If \code{nboot=NULL} (default) no bootstrap is applied. 
 }
 
+\item{missings}{: Argument that controls how the missing values should be treated. If \code{missings="omit"} (default) list-wise deletion is applied to \code{data}. If \code{missings="impute"} then the mice function is applied to \code{data} in order to impute the missings \code{nmice} times.
+}
+
+\item{nmice}{: Argument that controls the number of mice imputations (This argument is used only when \code{missings="impute"} and \code{nboot=NULL}. 
+}
+
+\item{seed}{: Argument that is used for reproducibility of bootstrap results. 
+}
+\item{mincor}{: This can be scalar, numeric vector (of size \code{ncol(data)}) or numeric matrix (square, of size \code{ncol(data)} specifying the minimum threshold(s) against which the absolute correlation in the data is compared. See \code{?mice:::quickpred} for more details.
+}
 \item{...}{: Any additional arguments that are passed to the \code{boot} function from the package \pkg{boot}. See \code{?boot::boot}.
 }
 
@@ -37,7 +48,7 @@ This function incorporates a two-step algorithm that determines an unfolding sca
 
 In \code{mudfold} function, the user can specify a value \eqn{\lambda_1} that will be used as a lower bound in the scalability criteria of the MUDFOLD algorithm. By default, the lower bound for the scalability coefficients is \code{lambda1=0.3}. The user can choose a second value \eqn{\lambda_2} that will be used as a lower bound only for the second step of the algorithm (by default, \code{lambda2=0}). The parameter \eqn{\lambda_2} is used mostly, in order to relax the first scalability criterion of the second step. Generally, values greater than \eqn{0.3} for \eqn{\lambda_1}, and \eqn{\lambda_2} lead to very strict criteria while negative values relax these criteria.
 
-Uncertainty estimates of the MUDFOLD statistics can be calculated with the argument \code{nboot} of the \code{mudfold} function. When \code{nboot} is an integer then \code{nboot} bootstrap iterations will run to obtain the variance parameter for each MUDFOLD statistic.
+Uncertainty estimates of the MUDFOLD statistics can be calculated with the argument \code{nboot} of the \code{mudfold} function. When \code{nboot} is an integer then \code{nboot} bootstrap iterations will run to obtain the variance parameter for each MUDFOLD statistic. Missing values are either list-wise deleted or they are imputed \code{nmice} times when \code{nboot=NULL} and \code{missings="impute"}. If the argument \code{nboot} is not \code{NULL} and  \code{missings="impute"} then each resampled dataset in bootstrap iterations is imputed once before we fit a MUDFOLD scale.
 
 Moreover, the user is able to choose between two nonparametric estimation methods in order to obtain person parameters that are estimated using the item ranks from the MUDFOLD algorithm. The default setting (i.e., \code{estimation="rank"}) uses an estimation proposed by Van Schuur(1984) based on item ranks. Alternatively, an estimation method described by Johnson(2005), which uses item quantiles for estimating person parameters, can be used by setting \code{estimation="quantile"}.
 }
@@ -92,7 +103,7 @@ fit_andr <- mudfold(ANDRICH)
 ## print.mdf
 print(fit_andr)
 ## summary.mdf
-summary(fit_andr, diagnostics=TRUE)
+summary(fit_andr)
 ## plot.mdf
 plot(fit_andr)
 
@@ -104,7 +115,7 @@ fit_andr_boot <- mudfold(ANDRICH, nboot=100)
 ## print.mdf
 print(fit_andr_boot)
 ## summary.mdf
-summary(fit_andr_boot, boot=TRUE, diagnostics=FALSE)
+summary(fit_andr_boot, boot=TRUE)
 ## plot.mdf
 plot(fit_andr_boot)
 
@@ -117,7 +128,7 @@ data("EURPAR2")
 fit_eurp <- mudfold(EURPAR2)
 
 ## print
-print(fit_eurp,Diagnostics = TRUE)
+print(fit_eurp)
 
 ## summary
 summary(fit_eurp)
