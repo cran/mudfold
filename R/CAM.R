@@ -1,5 +1,5 @@
 CAM <-function(x){
-  if (class(x) == "mdf"){
+  if (inherits(x,"mdf")){
     y <- x$MUDFOLD_INFO$second_step$CAM
     class(y) <- "cam.mdf"
     return(y)

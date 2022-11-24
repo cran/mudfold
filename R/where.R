@@ -1,19 +1,4 @@
-#' Creates a \code{where} argument
-#'
-#' This helper function creates a valid \code{where} matrix. The 
-#' \code{where} matrix is an argument to the \code{mice} function. 
-#' It has the same size as \code{data} and specifies which values 
-#' are to be imputed (\code{TRUE}) or nor (\code{FALSE}).
-#' @param data A \code{data.frame} with the source data
-#' @param keyword An optional keyword, one of \code{"missing"} (missing
-#' values are imputed), \code{"observed"} (observed values are imputed),
-#' \code{"all"} and \code{"none"}. The default 
-#' is \code{keyword = "missing"}
-#' @return A matrix with logical
-#' @seealso \code{\link{make.blocks}}, \code{\link{make.predictorMatrix}}
-#' @examples
-#' head(make.where(nhanes), 3)
-#' @export
+
 make.where <- function(data, 
                        keyword = c("missing", "all", "none", "observed")) {
   keyword <- match.arg(keyword)

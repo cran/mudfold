@@ -1,14 +1,4 @@
-#' Creates a \code{method} argument
-#'
-#' This helper function creates a valid \code{method} vector. The 
-#' \code{method} vector is an argument to the \code{mice} function that 
-#' specifies the method for each block.
-#' @inheritParams mice
-#' @return Vector of \code{length(blocks)} element with method names
-#' @seealso \code{\link{mice}}
-#' @examples
-#' make.method(nhanes2)
-#' @export
+
 make.method <- function(data, where = make.where(data), blocks = make.blocks(data),
                         defaultMethod = c("pmm", "logreg", "polyreg", "polr")) {
   

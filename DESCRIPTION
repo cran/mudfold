@@ -1,21 +1,22 @@
 Package: mudfold
 Type: Package
 Title: Multiple UniDimensional unFOLDing
-Version: 1.1.2
-Date: 2019-12-14
-Authors@R: c(person("Spyros", "Balafas", email = "s.balafas@rug.nl", role = c("aut", "cre")),person("Wim", "Krijnen", role = "aut"),person("Wendy", "Post", role = "ctb"),person("Ernst", "Wit", role = "aut"))
+Version: 1.1.21
+Date: 2022-11-23
+Authors@R: c(person("Spyros", "Balafas", email = "sp.balafas@gmail.com", role = c("aut", "cre")),person("Wim", "Krijnen", role = "aut"),person("Wendy", "Post", role = "ctb"),person("Ernst", "Wit", role = "aut"))
 Description: Nonparametric unfolding item response theory (IRT) model for dichotomous data (see W.H. Van Schuur (1984). Structure in Political Beliefs: A New Model for Stochastic Unfolding with Application to European Party Activists, and W.J.Post (1992). Nonparametric Unfolding Models: A Latent Structure Approach). The package implements MUDFOLD (Multiple UniDimensional unFOLDing), an iterative item selection algorithm that constructs unfolding scales from dichotomous preferential-choice data without explicitly assuming a parametric form of the item response functions. Scale diagnostics from Post(1992) and estimates for the person locations proposed by Johnson(2006) and Van Schuur(1984) are also available. This model can be seen as the unfolding variant of Mokken(1971) scaling method.
 Depends: R (>= 3.3.3)
 Imports: boot, glmnet, mgcv, ggplot2, zoo, reshape2, stats, utils,
         grDevices, broom, dplyr, graphics
 License: GPL (>= 2)
 URL: https://github.com/cran/mudfold
-Maintainer: Spyros Balafas <s.balafas@rug.nl>
+Maintainer: Spyros Balafas <sp.balafas@gmail.com>
 Repository: CRAN
 NeedsCompilation: no
 Author: Spyros Balafas [aut, cre],
   Wim Krijnen [aut],
   Wendy Post [ctb],
   Ernst Wit [aut]
-Date/Publication: 2019-12-19 20:20:02 UTC
-Packaged: 2019-12-19 19:35:56 UTC; balaf
+Date/Publication: 2022-11-24 09:30:02 UTC
+RoxygenNote: 7.2.1
+Packaged: 2022-11-23 22:34:56 UTC; SpyrosBalafas

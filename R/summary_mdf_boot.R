@@ -64,13 +64,13 @@ summary_mdf_boot <- function(object, type, ...){
   BOOTCI <- lapply(1:tot_cols, 
                    function(x) boot.ci(object$BOOTSTRAP$BOOT,
                                        index = x,type = type))
-  
+  mmatc <- match(item.index,sn)
   BOOT_BIAS_STD_SCALE <- BOOT_BIAS_STD[scale_in,]
-  BOOT_BIAS_STD_ITEMH <- BOOT_BIAS_STD[itemH_in,][match(item.index,sn),]
-  BOOT_BIAS_STD_ITEMIS <- BOOT_BIAS_STD[itemIs_in,][match(item.index,sn),]
-  BOOT_BIAS_STD_ITEMAX <- BOOT_BIAS_STD[itemMx_in,][match(item.index,sn),]
-  BOOT_BIAS_STD_ITEMEO <- BOOT_BIAS_STD[itemEO_in,][match(item.index,sn),]
-  BOOT_BIAS_STD_ITEMO <- BOOT_BIAS_STD[itemO_in,][match(item.index,sn),]
+  BOOT_BIAS_STD_ITEMH <- BOOT_BIAS_STD[itemH_in,][mmatc,]
+  BOOT_BIAS_STD_ITEMIS <- BOOT_BIAS_STD[itemIs_in,][mmatc,]
+  BOOT_BIAS_STD_ITEMAX <- BOOT_BIAS_STD[itemMx_in,][mmatc,]
+  BOOT_BIAS_STD_ITEMEO <- BOOT_BIAS_STD[itemEO_in,][mmatc,]
+  BOOT_BIAS_STD_ITEMO <- BOOT_BIAS_STD[itemO_in,][mmatc,]
   
   
   
@@ -110,7 +110,7 @@ summary_mdf_boot <- function(object, type, ...){
   
   
   summaryobject$ITEM_STATS <- list()
-  HCISTART <- t(sapply(BOOTCI_ITEM_H[match(item.index,sn)],function(x,type){
+  HCISTART <- t(sapply(BOOTCI_ITEM_H[mmatc],function(x,type){
     if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))
@@ -125,7 +125,7 @@ summary_mdf_boot <- function(object, type, ...){
   
   
   
-  ISOCISTART <- lapply(BOOTCI_ITEM_ISO[match(item.index,sn)],function(x){
+  ISOCISTART <- lapply(BOOTCI_ITEM_ISO[mmatc],function(x){
     if (any(is.na(x[[4]]))) return(c(NA,NA)) else{
       if (type=="norm") return(round(x$normal[,2:3],3))
       if (type=="basic") return(round(x$basic[,4:5],3))

@@ -10,10 +10,6 @@ print.mdf <- function(x, ...){
     cat("\nNumber of cases with missings:",x$CHECK$SAMPLE$missing_values$ndel_rows)
     cat("\nTotal number of missings:",sum(x$CHECK$SAMPLE$missing_values$missing_rows))
     cat("\nMissings per item:",x$CHECK$SAMPLE$missing_values$missing_cols)
-    mat_miss <- matrix(NA, ncol = length(x$CHECK$SAMPLE$missing_values$deleted_rows),nrow = 1,dimnames = list("nmiss",x$CHECK$SAMPLE$missing_values$deleted_rows) )
-    mat_miss[1,] <- x$CHECK$SAMPLE$missing_values$missing_rows[x$CHECK$SAMPLE$missing_values$deleted_rows]
-    cat("\nPersons with missings:")
-    print(mat_miss)
     if (x$CALL$missings=="impute"){
       if (!x$CALL$Bootstrap){
         cat("\nMultiple imputation (mice):","YES")
@@ -36,7 +32,6 @@ print.mdf <- function(x, ...){
     }
   
   } 
-
   cat("\nIndividuals:", x$DESCRIPTIVES$n_persons_final)
   cat("\nItems:", x$DESCRIPTIVES$n_items_final,"\n")
   cat("\nEstimation method:",x$CALL$estimation)
@@ -68,7 +63,7 @@ print.mdf <- function(x, ...){
     cat("\nIso statistic for the MUDFOLD scale:",x$MUDFOLD_INFO$second_step$ISOscale)
     if (x$CALL$Bootstrap){
       cat("\nBootstrap 95% percentile CI for the ISO statistic:",
-          paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 2)$percent[,4:5],3),collapse = ", "),")",sep = ""),"\n")
+          paste("(",paste(round(boot.ci(x$BOOTSTRAP$BOOT,type = "perc",index = 2)$percent[,4:5],3),collapse = ", "),")",sep = ""))
     }
     cat("\nMax statistic for the MUDFOLD scale:",x$MUDFOLD_INFO$second_step$MAXscale)
     if (x$CALL$Bootstrap){
@@ -77,7 +72,6 @@ print.mdf <- function(x, ...){
       cat("\nSummary of bootstrap iterations:\n")
       print(summary(x$BOOTSTRAP$BOOT$t)[,1:3])
     }
-    
     cat("\n")
   }else{
     cat("\n")

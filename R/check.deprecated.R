@@ -1,4 +1,3 @@
-# contributed by Simon Grund, #137
 check.deprecated <- function(...) {
   # print warnings for deprecated argument names
   nms <- names(list(...))

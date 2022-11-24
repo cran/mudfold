@@ -16,6 +16,7 @@ plot_persons <- function(x, ...){
                                 axis.title = element_text(face = "bold",size = rel(1)),
                                 axis.title.y = element_text(angle=90,vjust =2),
                                 axis.title.x = element_text(vjust = -0.2),
+                                axis.text.x = element_text(face = "bold"),
                                 axis.line = element_line(colour="black"),
                                 panel.grid.major = element_blank(),
                                 panel.grid.minor = element_blank(),

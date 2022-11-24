@@ -1,8 +1,8 @@
 ISO <-function(x, type){
   if (missing(type)) type <-  "item"
-  if (!class(x) %in% c("mdf","cam.mdf")) stop("The input of ISO() function should be an output of the CAM() or mudfold() functions respectively.")
+  if (!inherits(x, c("mdf","cam.mdf"))) stop("The input of ISO() function should be an output of the CAM() or mudfold() functions respectively.")
   if (!type %in% c("item", "scale")) stop("ISO can be calculated only for items or the total scale.")
-  if (class(x)=="mdf"){
+  if (inherits(x,"mdf")){
     if (type=="scale") return(x$MUDFOLD_INFO$second_step$ISOscale)
     if (type=="item") return(x$MUDFOLD_INFO$second_step$ISOitem)
   }else{

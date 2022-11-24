@@ -98,7 +98,7 @@ mudfold_se <- function(out){
   list_res$MUDFOLD_INFO$second_step$ISOitem <- ISO(list_res$MUDFOLD_INFO$second_step$CAM)
   list_res$MUDFOLD_INFO$second_step$ISOscale <- sum(list_res$MUDFOLD_INFO$second_step$ISOitem)
   list_res$MUDFOLD_INFO$second_step$MAXitem <- MAX(list_res$MUDFOLD_INFO$second_step$CAM)
-  list_res$MUDFOLD_INFO$second_step$MAXscale <- sum(list_res$MUDFOLD_INFO$second_step$MAXitem) / (list_res$MUDFOLD_INFO$second_step$Lscale^2 / 12)
+  list_res$MUDFOLD_INFO$second_step$MAXscale <- sum(list_res$MUDFOLD_INFO$second_step$MAXitem) 
   list_res$MUDFOLD_INFO$second_step$OBSitem <- Err_obs_item(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$OBSscale<- Err_obs_scale(data[,b_unq],O=obserr)
   list_res$MUDFOLD_INFO$second_step$EXPitem <- Err_exp_item(data[,b_unq],EO=experr)

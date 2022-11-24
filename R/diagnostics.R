@@ -1,13 +1,13 @@
 diagnostics <- function(x, boot, nlambda, lambda.crit, type, k, which, plot){
   if (missing(x)) stop("argument 'x' must be provided")
-  if (class(x) != "mdf")  stop("x must be an object of class 'mdf'.")
+  if (!inherits(x,"mdf"))  stop("x must be an object of class 'mdf'.")
   if (missing(boot)) boot <- TRUE
   if (missing(nlambda)) nlambda <- 100
   if (missing(lambda.crit)) lambda.crit <- "class"
   if (!lambda.crit %in% c("class", "deviance", "auc", "mse","mae")) stop("The 'lambda.crit' method is not correctly specified. Check the argument 'type.measure' in the cv.glmnet() function from the R package glmnet for further details. ")
   if (missing(k)) k <- 4
   if (missing(which)) which <- "all"
-  if (! which %in% c("H","LI", "UM", "ISO", "MAX", "STAR","all")) stop("Available options for the argument 'which' are: 'H', 'LI', 'UM', 'ISO', 'MAX', 'STAR','all'  ")
+  if (!which %in% c("H","LI", "UM", "ISO", "MAX", "STAR","all")) stop("Available options for the argument 'which' are: 'H', 'LI', 'UM', 'ISO', 'MAX', 'STAR','all'  ")
   if (missing(plot)) plot <- TRUE
   if (missing(type)) type <- "perc"
   
@@ -28,52 +28,77 @@ diagnostics <- function(x, boot, nlambda, lambda.crit, type, k, which, plot){
   }
   if ("LI" %in% which | which == "all"){
     checkUNIQ <- apply(apply(x$CALL$data, 2, function(x) table(x)),1, function(y) any(y==1))
-    if (any(checkUNIQ)) return("There exist items with only one positive or negative response.\n Local independence cannot be checked in such situtations\n
+    if (any(checkUNIQ)){
+      warning("There exist items with only one positive or negative response.\n Local independence cannot be checked in such situtations\n
                                Consider removing this item(s)")
-    new_dat <- na.omit(data.frame(x$CALL$data,theta=x$MUDFOLD_INFO$second_step$estimates$thetas))
-    Ntot <- x$MUDFOLD_INFO$second_step$Lscale + 1
-    items <- x$MUDFOLD_INFO$second_step$scale
-    nitm <- x$MUDFOLD_INFO$second_step$Lscale 
-    nrem <- x$MUDFOLD_INFO$second_step$Lscale -1
-    glm_list <- lapply(1:nitm, function(i){
-      remit <- items[-i]
-      Y <- as.matrix(new_dat[,items[i]])
-      X <- as.matrix(new_dat[, c(remit,"theta")])
-      vector_pen <- rep(1, ncol(X))
-      vector_pen[length(vector_pen)] <- 0
-      fit_glmnet <- cv.glmnet(x=X, y=Y,
-                              type.measure =lambda.crit, 
-                              family= "binomial",
-                              nlambda = nlambda,
-                              intercept=TRUE,
-                              standardize=FALSE,
-                              penalty.factor=vector_pen)
-      glm.fit <- as.matrix(coef(fit_glmnet)[-1,])
-      return(glm.fit)
-    })
-    tot_viol <- (nitm*(nitm-1))/2
-    COEF_SPARSE <- matrix(NA, ncol = nitm, nrow = nitm, dimnames = list(items,items))
-    for (row in 1:nitm) COEF_SPARSE[row,-row] <- unlist(glm_list[[row]][1:nrem]) 
-    CI_viol <- apply(COEF_SPARSE,2, function(x) ifelse(x==0,0,1))
-    diag(CI_viol) <- 0
-    vec_new_mat <- matrix(NA,nitm,nitm)
-    vec_new_mat <- sapply(1:nitm, function(x) sapply(1:nitm, function(y) ifelse(CI_viol[x,y]==CI_viol[y,x] & CI_viol[x,y]==1,1,0)))
-    vec_new_mat <-  as.matrix(vec_new_mat)
-    vec_new_mat[upper.tri(vec_new_mat,diag = TRUE)] <- 0
-    dimnames(vec_new_mat) <- list(x$MUDFOLD_INFO$second_step$scale,x$MUDFOLD_INFO$second_step$scale)
-    if (plot){
-      image(x=1:x$MUDFOLD_INFO$second_step$Lscale,y=1:x$MUDFOLD_INFO$second_step$Lscale,z= vec_new_mat,
-            xlab="", ylab=" ", xaxt='n', yaxt='n', main="Local Independence")
-      axis(2, at=1:x$MUDFOLD_INFO$second_step$Lscale,labels=x$MUDFOLD_INFO$second_step$scale, col.axis="black", las=2)
-      axis(1, at=1:x$MUDFOLD_INFO$second_step$Lscale,labels=x$MUDFOLD_INFO$second_step$scale, col.axis="black", las=2)
-      title(ylab="Row index", line=3, cex.lab=1.2)
-      title(xlab="Column index", line=4, cex.lab=1.2)
-    }
-    indexes_viol <- which(vec_new_mat!=0,arr.ind = T)
-    diagnost_list$LI$viol <- sum(vec_new_mat)
-    diagnost_list$LI$viol_stat <- diagnost_list$LI$viol / tot_viol
-    diagnost_list$LI$viol_pairs <- cbind(x$MUDFOLD_INFO$second_step$scale[indexes_viol[,1]],x$MUDFOLD_INFO$second_step$scale[indexes_viol[,2]])
-    if (lw==1 & which == "LI") return(diagnost_list$LI)
+    }else{
+      new_dat <- na.omit(data.frame(x$CALL$data,theta=x$MUDFOLD_INFO$second_step$estimates$thetas))
+      Ntot <- x$MUDFOLD_INFO$second_step$Lscale + 1
+      items <- x$MUDFOLD_INFO$second_step$scale
+      nitm <- x$MUDFOLD_INFO$second_step$Lscale 
+      nrem <- x$MUDFOLD_INFO$second_step$Lscale -1
+      glm_list <- lapply(1:nitm, function(i){
+        remit <- items[-i]
+        Y <- as.matrix(new_dat[,items[i]])
+        X <- as.matrix(new_dat[, c(remit,"theta")])
+        vector_pen <- rep(1, ncol(X))
+        vector_pen[length(vector_pen)] <- 0
+        fit_glmnet <- try(cv.glmnet(x=X, y=Y,
+                                type.measure =lambda.crit, 
+                                family= "binomial",
+                                nlambda = nlambda,
+                                #lambda = seq(0.1,0.001,length.out=nlambda),
+                                intercept=FALSE,
+                                standardize=FALSE,
+                                maxit=1000000,
+                                alpha=1,
+                                penalty.factor=vector_pen))
+        if (inherits(fit_glmnet,"try-error")){
+          fit_glmnet <- try(cv.glmnet(x=X, y=Y,
+                                      type.measure =lambda.crit, 
+                                      family= "binomial",
+                                      nlambda = nlambda,
+                                      #lambda = seq(0.1,0.001,length.out=nlambda),
+                                      intercept=FALSE,
+                                      standardize=FALSE,
+                                      maxit=1000000,
+                                      alpha=1,
+                                      penalty.factor=vector_pen))
+          glm.fit <- as.matrix(coef(fit_glmnet)[-1,])
+          return(glm.fit)
+          
+        }else{
+          glm.fit <- as.matrix(coef(fit_glmnet)[-1,])
+          return(glm.fit)
+        }
+          
+
+        
+      })
+      tot_viol <- (nitm*(nitm-1))/2
+      COEF_SPARSE <- matrix(NA, ncol = nitm, nrow = nitm, dimnames = list(items,items))
+      for (row in 1:nitm) COEF_SPARSE[row,-row] <- unlist(glm_list[[row]][1:nrem]) 
+      CI_viol <- apply(COEF_SPARSE,2, function(x) ifelse(x==0,0,1))
+      diag(CI_viol) <- 0
+      vec_new_mat <- matrix(NA,nitm,nitm)
+      vec_new_mat <- sapply(1:nitm, function(x) sapply(1:nitm, function(y) ifelse(CI_viol[x,y]==CI_viol[y,x] & CI_viol[x,y]==1,1,0)))
+      vec_new_mat <-  as.matrix(vec_new_mat)
+      vec_new_mat[upper.tri(vec_new_mat,diag = TRUE)] <- 0
+      dimnames(vec_new_mat) <- list(x$MUDFOLD_INFO$second_step$scale,x$MUDFOLD_INFO$second_step$scale)
+      if (plot){
+        image(x=1:x$MUDFOLD_INFO$second_step$Lscale,y=1:x$MUDFOLD_INFO$second_step$Lscale,z= vec_new_mat,
+              xlab="", ylab=" ", xaxt='n', yaxt='n', main="Local Independence")
+        axis(2, at=1:x$MUDFOLD_INFO$second_step$Lscale,labels=x$MUDFOLD_INFO$second_step$scale, col.axis="black", las=2)
+        axis(1, at=1:x$MUDFOLD_INFO$second_step$Lscale,labels=x$MUDFOLD_INFO$second_step$scale, col.axis="black", las=2)
+        title(ylab="Row index", line=3, cex.lab=1.2)
+        title(xlab="Column index", line=4, cex.lab=1.2)
+      }
+      indexes_viol <- which(vec_new_mat!=0,arr.ind = T)
+      diagnost_list$LI$viol <- sum(vec_new_mat)
+      diagnost_list$LI$viol_stat <- diagnost_list$LI$viol / tot_viol
+      diagnost_list$LI$viol_pairs <- cbind(x$MUDFOLD_INFO$second_step$scale[indexes_viol[,1]],x$MUDFOLD_INFO$second_step$scale[indexes_viol[,2]])
+      if (lw==1 & which == "LI") return(diagnost_list$LI)
+    } 
   }
   if ("UM" %in% which | which == "all"){
     data_new <- na.omit(data.frame(x$CALL$data[,x$MUDFOLD_INFO$second_step$scale],THETA=x$MUDFOLD_INFO$second_step$estimates$thetas))
@@ -86,6 +111,7 @@ diagnostics <- function(x, boot, nlambda, lambda.crit, type, k, which, plot){
       plot(seq(min(data_new$THETA),max(data_new$THETA),length.out = 100),
            predict_test1, 
            type = "l",
+           ylim = c(0,1),
            main = paste("Estimated IRF for",items[i]),
            xlab="Theta", ylab=paste("P(",items[i],"= 1 | Theta)",sep = " " ) )
     }

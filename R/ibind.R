@@ -1,33 +1,4 @@
-#'Enlarge number of imputations by combining \code{mids} objects
-#' 
-#'This function combines two \code{mids} objects \code{x} and \code{y} into a
-#'single \code{mids} object, with the objective of increasing the number of 
-#'imputed data sets. If the number of imputations in \code{x} and \code{y} are 
-#'\code{m(x)} and \code{m(y)}, then the combined object will have 
-#'\code{m(x)+m(y)} imputations. 
-#'
-#'The two \code{mids} objects are required to 
-#'have the same underlying multiple imputation model and should 
-#'be fitted on the same data. 
-#'
-#'@param x A \code{mids} object.
-#'@param y A \code{mids} object.
-#'@return An S3 object of class \code{mids}
-#'@author Karin Groothuis-Oudshoorn, Stef van Buuren
-#'@seealso \code{\link[=mids-class]{mids}}, \code{\link{rbind.mids}}, \code{\link{cbind.mids}}
-#'@keywords manip
-#'@examples
-#'data(nhanes)
-#'imp1 <- mice(nhanes, m = 1, maxit = 2, print = FALSE)
-#'imp1$m
-#'
-#'imp2 <- mice(nhanes, m = 3, maxit = 3, print = FALSE)
-#'imp2$m
-#'
-#'imp12 <- ibind(imp1, imp2)
-#'imp12$m
-#'plot(imp12)
-#'@export
+
 ibind <- function(x, y) {
   call <- match.call()
   call <- c(x$call, call)

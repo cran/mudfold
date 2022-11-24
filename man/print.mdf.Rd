@@ -11,7 +11,6 @@
 
 \arguments{
    \item{x}{Object of class \code{"mdf"}}
-
    \item{...}{further arguments passed on to the \code{print} method.}
 }
 

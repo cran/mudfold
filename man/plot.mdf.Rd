@@ -5,11 +5,11 @@
 \description{Generic function for plotting S3 class \code{"mdf"} objects. This function, is plotting the rows of the conditional adjacency matrix (CAM) which are nonparametric estimates of the item response functions. The plot is produced using the \code{ggplot} function from the package \pkg{ggplot2}.
 }
 \usage{
-\method{plot}{mdf}(x, select=NULL, plot.type="IRF", ...)
+\method{plot}{mdf}(x, select, plot.type, ...)
 }
 \arguments{
     \item{x}{Object of class \code{mdf}}
-    \item{select}{: in this argument the user can provide a subset of items he would like them to be explicitly plotted. If \code{select=NULL} the estimated IRF for every item in the scale is plotted. When \code{plot.type="persons"} this argument is ignored.}
+    \item{select}{: in this argument the user can provide a subset of items he would like them to be explicitly plotted. If the \code{select} argument is empty the estimated IRF for every item in the scale is plotted. When \code{plot.type="persons"} this argument is ignored.}
     \item{plot.type}{: Determines the type of plot that is returned. By default, \code{plot.type="IRF"}, which returns the estimated IRFs for the items in the MUDFOLD scale. The user can set \code{plot.type="scale"} in order to get plotted the unidimensional MUDFOLD scale. Setting \code{plot.type="persons"} will return the distribution of the person parameters on the latent scale.}
     \item{\dots}{Other arguments passed on to \code{ggplot} plotting method.}
 }
